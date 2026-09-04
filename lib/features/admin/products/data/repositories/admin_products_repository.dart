@@ -28,8 +28,8 @@ class AdminProductsRepository {
     try {
       final response = await _dio.get(ApiConstants.adminProducts, queryParameters: {
         if (search != null && search.isNotEmpty) 'search': search,
-        if (categoryId != null) 'category_id': categoryId,
-        if (status != null) 'status': status,
+        'category_id': ?categoryId,
+        'status': ?status,
         'page': page,
       });
 

@@ -595,7 +595,7 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _images.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 final img = _images[index];
                 return SizedBox(

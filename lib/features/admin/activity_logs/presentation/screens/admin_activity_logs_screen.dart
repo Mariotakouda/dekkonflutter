@@ -63,7 +63,7 @@ class _AdminActivityLogsScreenState
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               itemCount: _entityTypes.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final entityType = _entityTypes[index];
                 final selected = _selectedEntityType == entityType;
@@ -93,7 +93,7 @@ class _AdminActivityLogsScreenState
           Expanded(
             child: state.when(
               loading: () => const LoadingIndicator(),
-              error: (_, __) => ErrorView(
+              error: (_, _) => ErrorView(
                 message: 'Impossible de charger le journal.',
                 onRetry: () => ref.invalidate(adminActivityLogsProvider),
               ),
@@ -114,7 +114,7 @@ class _AdminActivityLogsScreenState
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: filteredLogs.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, index) =>
                       _LogTile(log: filteredLogs[index]),
                 );

@@ -3,9 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/admin_permissions.dart';
-import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/theme/app_text_styles.dart';
-import '../../../../../core/theme/app_theme.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
@@ -130,7 +127,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: const Color(0xFFFF6600).withOpacity(0.12),
+                      backgroundColor: const Color(0xFFFF6600).withValues(alpha: 0.12),
                       child: Text(
                         initials,
                         style: const TextStyle(
@@ -323,7 +320,7 @@ class _MobileAdminTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -348,7 +345,7 @@ class _MobileAdminTile extends StatelessWidget {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: tile.color.withOpacity(0.1),
+                        color: tile.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(tile.icon, color: tile.color, size: 20),
