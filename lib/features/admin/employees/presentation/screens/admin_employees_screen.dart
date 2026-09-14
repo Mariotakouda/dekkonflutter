@@ -13,6 +13,7 @@ import '../../data/models/admin_employee_model.dart';
 import '../providers/admin_employees_provider.dart';
 import 'admin_employee_form_screen.dart';
 import 'admin_roles_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminEmployeesScreen extends ConsumerStatefulWidget {
   const AdminEmployeesScreen({super.key});
@@ -55,7 +56,7 @@ class _AdminEmployeesScreenState extends ConsumerState<AdminEmployeesScreen> {
         actions: [
           if (canManageRoles)
             IconButton(
-              icon: const Icon(Icons.admin_panel_settings_outlined),
+              icon: const Icon(Symbols.admin_panel_settings),
               tooltip: 'Gérer les rôles',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const AdminRolesScreen()),
@@ -72,7 +73,7 @@ class _AdminEmployeesScreenState extends ConsumerState<AdminEmployeesScreen> {
                 );
                 if (created == true) ref.read(adminEmployeeListProvider.notifier).loadFirstPage();
               },
-              child: const Icon(Icons.person_add_outlined, color: Colors.white),
+              child: const Icon(Symbols.person_add, color: Colors.white),
             )
           : null,
       body: state.isLoading
@@ -83,7 +84,7 @@ class _AdminEmployeesScreenState extends ConsumerState<AdminEmployeesScreen> {
                   onRetry: () => ref.read(adminEmployeeListProvider.notifier).loadFirstPage(),
                 )
               : state.employees.isEmpty
-                  ? const EmptyState(icon: Icons.people_outline, title: 'Aucun employé')
+                  ? const EmptyState(icon: Symbols.people, title: 'Aucun employé')
                   : ListView.separated(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),

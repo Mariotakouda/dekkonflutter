@@ -13,6 +13,7 @@ import '../../data/models/admin_product_model.dart';
 import '../providers/admin_products_provider.dart';
 import 'admin_product_create_screen.dart';
 import 'admin_product_detail_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminProductsListScreen extends ConsumerStatefulWidget {
   const AdminProductsListScreen({super.key});
@@ -58,7 +59,7 @@ class _AdminProductsListScreenState extends ConsumerState<AdminProductsListScree
           );
           if (created == true) ref.read(adminProductListProvider.notifier).loadFirstPage();
         },
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Symbols.add, color: Colors.white),
       ),
       body: Column(
         children: [
@@ -69,7 +70,7 @@ class _AdminProductsListScreenState extends ConsumerState<AdminProductsListScree
               onSubmitted: (v) => ref.read(adminProductListProvider.notifier).search(v.trim()),
               decoration: const InputDecoration(
                 hintText: 'Rechercher un produit...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: Icon(Symbols.search),
               ),
             ),
           ),
@@ -82,7 +83,7 @@ class _AdminProductsListScreenState extends ConsumerState<AdminProductsListScree
                         onRetry: () => ref.read(adminProductListProvider.notifier).loadFirstPage(),
                       )
                     : state.products.isEmpty
-                        ? const EmptyState(icon: Icons.inventory_2_outlined, title: 'Aucun produit')
+                        ? const EmptyState(icon: Symbols.inventory_2, title: 'Aucun produit')
                         : GridView.builder(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(16),
@@ -135,7 +136,7 @@ class _ProductTile extends StatelessWidget {
                         ? CachedNetworkImage(imageUrl: product.primaryImageUrl!, fit: BoxFit.cover)
                         : Container(
                             color: AppColors.background,
-                            child: const Icon(Icons.image_outlined, color: AppColors.textDisabled),
+                            child: const Icon(Symbols.image, color: AppColors.textDisabled),
                           ),
                   ),
                   Positioned(

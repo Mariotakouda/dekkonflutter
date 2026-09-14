@@ -15,6 +15,7 @@ import '../../data/models/admin_product_model.dart';
 import '../../data/repositories/admin_products_repository.dart';
 import '../providers/admin_products_provider.dart';
 import 'admin_product_detail_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class _PendingImage {
   final XFile file;
@@ -463,11 +464,11 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    icon: const Icon(Symbols.edit, size: 18),
                     onPressed: () => _showVariantDraftDialog(existing: variant, index: index),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                    icon: const Icon(Symbols.delete, size: 18, color: AppColors.error),
                     onPressed: () => _removeVariant(index),
                   ),
                 ],
@@ -476,7 +477,7 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
           }),
         OutlinedButton.icon(
           onPressed: () => _showVariantDraftDialog(),
-          icon: const Icon(Icons.add),
+          icon: const Icon(Symbols.add),
           label: Text(_variants.isEmpty ? 'Ajouter une variante' : 'Ajouter une autre variante'),
         ),
       ],
@@ -614,7 +615,7 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
                               return Container(
                                 color: AppColors.background,
                                 alignment: Alignment.center,
-                                child: const Icon(Icons.broken_image_outlined, color: AppColors.error, size: 24),
+                                child: const Icon(Symbols.broken_image, color: AppColors.error, size: 24),
                               );
                             },
                           ),
@@ -638,7 +639,7 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
-                            child: const Icon(Icons.close, size: 14, color: Colors.white),
+                            child: const Icon(Symbols.close, size: 14, color: Colors.white),
                           ),
                         ),
                       ),
@@ -651,7 +652,7 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                              child: const Icon(Icons.star_border, size: 14, color: AppColors.secondary),
+                              child: const Icon(Symbols.star, size: 14, color: AppColors.secondary),
                             ),
                           ),
                         ),
@@ -666,7 +667,7 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
           onPressed: _isPickingImage ? null : _pickImage,
           icon: _isPickingImage
               ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.add_photo_alternate_outlined),
+              : const Icon(Symbols.add_photo_alternate),
           label: Text(_images.isEmpty ? 'Ajouter une photo' : 'Ajouter une autre photo'),
         ),
       ],

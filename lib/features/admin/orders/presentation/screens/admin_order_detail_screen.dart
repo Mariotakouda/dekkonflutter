@@ -12,6 +12,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../orders/presentation/widgets/order_status_badge.dart';
 import '../providers/admin_orders_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminOrderDetailScreen extends ConsumerWidget {
   final String orderId;
@@ -103,7 +104,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
                 if (order.customer != null)
                   _Section(
                     title: 'Client',
-                    icon: Icons.person_outline,
+                    icon: Symbols.person,
                     color: AppColors.secondary,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +119,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
 
                 _Section(
                   title: 'Articles',
-                  icon: Icons.shopping_bag_outlined,
+                  icon: Symbols.shopping_bag,
                   color: AppColors.primaryDark,
                   child: Column(
                     children: order.items
@@ -146,7 +147,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
                 if (order.address != null)
                   _Section(
                     title: 'Adresse de livraison',
-                    icon: Icons.location_on_outlined,
+                    icon: Symbols.location_on,
                     color: const Color(0xFF2E7D32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +165,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
                 if (order.payments != null && order.payments!.isNotEmpty)
                   _Section(
                     title: 'Paiement',
-                    icon: Icons.payments_outlined,
+                    icon: Symbols.payments,
                     color: const Color(0xFF0277BD),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +178,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
                 if (order.delivery != null)
                   _Section(
                     title: 'Livraison',
-                    icon: Icons.local_shipping_outlined,
+                    icon: Symbols.local_shipping,
                     color: const Color(0xFFEF6C00),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +201,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
                 if (order.statusHistory != null && order.statusHistory!.isNotEmpty)
                   _Section(
                     title: 'Historique du statut',
-                    icon: Icons.history,
+                    icon: Symbols.history,
                     color: AppColors.textSecondary,
                     child: Column(
                       children: order.statusHistory!
@@ -211,7 +212,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
                                   children: [
                                     const Padding(
                                       padding: EdgeInsets.only(top: 4),
-                                      child: Icon(Icons.circle, size: 8, color: AppColors.primary),
+                                      child: Icon(Symbols.circle, size: 8, color: AppColors.primary),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(

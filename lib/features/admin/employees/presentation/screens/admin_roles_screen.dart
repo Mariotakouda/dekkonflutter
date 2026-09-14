@@ -9,6 +9,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../data/models/admin_employee_model.dart';
 import '../providers/admin_employees_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminRolesScreen extends ConsumerWidget {
   const AdminRolesScreen({super.key});
@@ -22,7 +23,7 @@ class AdminRolesScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () => _showCreateRoleDialog(context, ref),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Symbols.add, color: Colors.white),
       ),
       body: rolesAsync.when(
         loading: () => const LoadingIndicator(),
@@ -56,7 +57,7 @@ class AdminRolesScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
-                      role.isSystem ? Icons.shield_outlined : Icons.badge_outlined,
+                      role.isSystem ? Symbols.shield : Symbols.badge,
                       color: role.isSystem ? AppColors.textSecondary : const Color(0xFF5E35B1),
                       size: 20,
                     ),

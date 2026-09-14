@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/nav_debounce.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -15,6 +17,7 @@ import '../../../favorites/presentation/providers/favorites_provider.dart';
 import '../../data/models/products_model.dart';
 import '../providers/products_provider.dart';
 import '../widgets/variant_selector.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -117,7 +120,7 @@ class _ProductDetailContent extends ConsumerWidget {
           leading: Padding(
             padding: const EdgeInsets.all(8),
             child: _CircleIconButton(
-              icon: Icons.arrow_back,
+              icon: Symbols.arrow_back,
               onTap: () => Navigator.of(context).maybePop(),
             ),
           ),
@@ -125,11 +128,15 @@ class _ProductDetailContent extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(8),
               child: _CircleIconButton(
-                icon: (isFavoriteAsync.value ?? false) ? Icons.favorite : Icons.favorite_border,
+                icon: Symbols.favorite,
+                filled: isFavoriteAsync.value ?? false,
                 iconColor: (isFavoriteAsync.value ?? false) ? AppColors.error : AppColors.outline,
                 onTap: () {
                   if (!isAuthenticated) {
-                    context.push('/auth');
+                    context.push(
+                      '/auth',
+                      extra: AuthScreenArgs(redirectTo: '/products/${product.id}'),
+                    );
                     return;
                   }
                   ref.read(favoritesNotifierProvider.notifier).toggle(product.id, product: product);
@@ -162,7 +169,7 @@ class _ProductDetailContent extends ConsumerWidget {
                 if (product.averageRating != null)
                   Row(
                     children: [
-                      Icon(Icons.star_rounded, size: 18, color: AppColors.promotionYellow.withValues(alpha: 0.9)),
+                      Icon(Symbols.star_rounded, size: 18, color: AppColors.promotionYellow.withValues(alpha: 0.9)),
                       const SizedBox(width: 4),
                       Text(product.averageRating!.toStringAsFixed(1), style: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700)),
                     ],
@@ -202,7 +209,7 @@ class _ProductDetailContent extends ConsumerWidget {
                 Row(
                   children: [
                     Icon(
-                      isAvailable ? Icons.check_circle : Icons.cancel,
+                      isAvailable ? Symbols.check_circle : Symbols.cancel,
                       size: 16,
                       color: isAvailable ? AppColors.success : AppColors.error,
                     ),
@@ -288,7 +295,7 @@ class _ProductImageGalleryState extends State<_ProductImageGallery> {
       return Container(
         color: AppColors.surfaceContainerLow,
         child: const Center(
-          child: Icon(Icons.image_not_supported_outlined, size: 48, color: AppColors.textDisabled),
+          child: Icon(Symbols.image_not_supported, size: 48, color: AppColors.textDisabled),
         ),
       );
     }
@@ -306,7 +313,7 @@ class _ProductImageGalleryState extends State<_ProductImageGallery> {
             placeholder: (context, url) => Container(color: AppColors.surfaceContainerLow),
             errorWidget: (context, url, error) => Container(
               color: AppColors.surfaceContainerLow,
-              child: const Icon(Icons.broken_image_outlined, color: AppColors.textDisabled),
+              child: const Icon(Symbols.broken_image, color: AppColors.textDisabled),
             ),
           ),
         ),
@@ -341,8 +348,9 @@ class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final Color? iconColor;
   final VoidCallback onTap;
+  final bool filled;
 
-  const _CircleIconButton({required this.icon, required this.onTap, this.iconColor});
+  const _CircleIconButton({required this.icon, required this.onTap, this.iconColor, this.filled = false});
 
   @override
   Widget build(BuildContext context) {
@@ -355,7 +363,7 @@ class _CircleIconButton extends StatelessWidget {
         child: SizedBox(
           width: 40,
           height: 40,
-          child: Icon(icon, size: 20, color: iconColor ?? AppColors.textPrimary),
+          child: Icon(icon, fill: filled ? 1 : 0, size: 20, color: iconColor ?? AppColors.textPrimary),
         ),
       ),
     );
@@ -383,7 +391,10 @@ class _AddToCartBarState extends ConsumerState<_AddToCartBar> {
   Future<void> _addToCart() async {
     final isAuthenticated = ref.read(authNotifierProvider).isAuthenticated;
     if (!isAuthenticated) {
-      context.push('/auth');
+      NavDebounce.run(() => context.push(
+            '/auth',
+            extra: AuthScreenArgs(redirectTo: '/products/${widget.product.id}'),
+          ));
       return;
     }
 
@@ -401,8 +412,15 @@ class _AddToCartBarState extends ConsumerState<_AddToCartBar> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(error ?? 'Ajouté au panier.'),
+        // `context.go` et non `context.push` : '/cart' est un onglet de la
+        // coquille à navigation (StatefulShellRoute), et cet écran de détail
+        // est lui-même empilé au-dessus de cette coquille. Un `push` y
+        // empilerait une SECONDE instance complète de la coquille par-dessus
+        // la première (deux mêmes GlobalKey en simultané → crash
+        // "!keyReservation.contains(key)" / HeroControllerScope, écran rouge).
+        // `go` réutilise la coquille déjà présente et bascule juste l'onglet.
         action: error == null
-            ? SnackBarAction(label: 'Voir le panier', onPressed: () => context.push('/cart'))
+            ? SnackBarAction(label: 'Voir le panier', onPressed: () => context.go('/cart'))
             : null,
       ),
     );
@@ -435,7 +453,7 @@ class _AddToCartBarState extends ConsumerState<_AddToCartBar> {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.shopping_cart, size: 18),
+                    const Icon(Symbols.shopping_cart, size: 18),
                     const SizedBox(width: 8),
                     Text(isAvailable ? 'Ajouter au panier' : 'Rupture de stock'),
                   ],
@@ -457,13 +475,13 @@ class _QuantitySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _QtyButton(icon: Icons.remove, onTap: quantity > 1 ? () => onChanged(quantity - 1) : null),
+        _QtyButton(icon: Symbols.remove, onTap: quantity > 1 ? () => onChanged(quantity - 1) : null),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text('$quantity', style: AppTextStyles.labelLarge),
         ),
         _QtyButton(
-          icon: Icons.add,
+          icon: Symbols.add,
           onTap: quantity < maxQuantity ? () => onChanged(quantity + 1) : null,
         ),
       ],

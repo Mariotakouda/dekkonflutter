@@ -12,6 +12,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/admin_inventory_model.dart';
 import '../providers/admin_inventory_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminInventoryScreen extends ConsumerStatefulWidget {
   const AdminInventoryScreen({super.key});
@@ -69,7 +70,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> {
                   onRetry: () => ref.read(adminInventoryListProvider.notifier).loadFirstPage(),
                 )
               : state.items.isEmpty
-                  ? const EmptyState(icon: Icons.inventory_2_outlined, title: 'Aucun article')
+                  ? const EmptyState(icon: Symbols.inventory_2, title: 'Aucun article')
                   : ListView.separated(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),
@@ -101,7 +102,7 @@ class _InventoryTile extends ConsumerWidget {
       child: Row(
         children: [
           if (inventory.isLowStock) ...[
-            const Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 18),
+            const Icon(Symbols.warning_amber_rounded, color: AppColors.error, size: 18),
             const SizedBox(width: 8),
           ],
           Expanded(
@@ -124,7 +125,7 @@ class _InventoryTile extends ConsumerWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.tune, color: AppColors.primary),
+            icon: const Icon(Symbols.tune, color: AppColors.primary),
             onPressed: ref.watch(employeePermissionsProvider).has(AdminPermissions.inventoryUpdate)
                 ? () => _showAdjustDialog(context, ref, inventory)
                 : null,

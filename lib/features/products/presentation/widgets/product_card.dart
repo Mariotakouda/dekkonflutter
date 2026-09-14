@@ -10,6 +10,8 @@ import '../../../../core/utils/formatters.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../favorites/presentation/providers/favorites_provider.dart';
 import '../../data/models/products_model.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import '../../../../core/utils/nav_debounce.dart';
 
 class ProductCard extends ConsumerWidget {
   final ProductModel product;
@@ -26,7 +28,7 @@ class ProductCard extends ConsumerWidget {
         : const AsyncValue<bool>.data(false);
     final isFavorite = isFavoriteAsync.value ?? false;
 
-    void openDetail() => context.push('/products/${product.id}');
+    void openDetail() => NavDebounce.run(() => context.push('/products/${product.id}'));
 
     return GestureDetector(
       onTap: openDetail,
@@ -51,12 +53,12 @@ class ProductCard extends ConsumerWidget {
                           placeholder: (context, url) => Container(color: AppColors.shimmerBase),
                           errorWidget: (context, url, error) => Container(
                             color: AppColors.surfaceContainerLow,
-                            child: const Icon(Icons.image_not_supported_outlined, color: AppColors.textDisabled),
+                            child: const Icon(Symbols.image_not_supported, color: AppColors.textDisabled),
                           ),
                         )
                       : Container(
                           color: AppColors.surfaceContainerLow,
-                          child: const Icon(Icons.image_outlined, color: AppColors.textDisabled, size: 32),
+                          child: const Icon(Symbols.image, color: AppColors.textDisabled, size: 32),
                         ),
                 ),
                 if (product.hasDiscount)
@@ -95,7 +97,8 @@ class ProductCard extends ConsumerWidget {
                         boxShadow: AppTheme.ambientShadow,
                       ),
                       child: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        Symbols.favorite,
+                        fill: isFavorite ? 1 : 0,
                         size: 16,
                         color: isFavorite ? AppColors.error : AppColors.textSecondary,
                       ),
@@ -135,7 +138,7 @@ class ProductCard extends ConsumerWidget {
                             color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.add, size: 18, color: AppColors.onPrimary),
+                          child: const Icon(Symbols.add, size: 18, color: AppColors.onPrimary),
                         ),
                       ),
                     ],

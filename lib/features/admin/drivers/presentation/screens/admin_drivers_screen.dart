@@ -10,6 +10,7 @@ import '../../../../../core/widgets/empty_state.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../../deliveries/data/models/admin_delivery_model.dart';
 import '../providers/admin_drivers_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminDriversScreen extends ConsumerWidget {
   const AdminDriversScreen({super.key});
@@ -25,7 +26,7 @@ class AdminDriversScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () => _showCreateDriverDialog(context, ref),
-        child: const Icon(Icons.person_add_alt_1_outlined, color: Colors.white),
+        child: const Icon(Symbols.person_add_alt, color: Colors.white),
       ),
       body: driversState.when(
         loading: () => const LoadingIndicator(),
@@ -35,7 +36,7 @@ class AdminDriversScreen extends ConsumerWidget {
         ),
         data: (drivers) {
           if (drivers.isEmpty) {
-            return const EmptyState(icon: Icons.motorcycle_outlined, title: 'Aucun livreur');
+            return const EmptyState(icon: Symbols.motorcycle, title: 'Aucun livreur');
           }
 
           return ListView.separated(
@@ -151,7 +152,7 @@ class _DriverTile extends ConsumerWidget {
         children: [
           CircleAvatar(
             backgroundColor: _statusColor(driver.status).withValues(alpha: 0.12),
-            child: Icon(Icons.motorcycle, color: _statusColor(driver.status)),
+            child: Icon(Symbols.motorcycle, color: _statusColor(driver.status)),
           ),
           const SizedBox(width: 12),
           Expanded(

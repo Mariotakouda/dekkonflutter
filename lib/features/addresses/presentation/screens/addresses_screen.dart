@@ -10,6 +10,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../data/models/addresses_model.dart';
 import '../providers/addresses_provider.dart';
 import 'address_form_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AddressesScreen extends ConsumerWidget {
   final bool selectionMode;
@@ -32,14 +33,14 @@ class AddressesScreen extends ConsumerWidget {
         data: (addresses) {
           if (addresses.isEmpty) {
             return EmptyState(
-              icon: Icons.location_on_outlined,
+              icon: Symbols.location_on,
               title: 'Aucune adresse enregistrée',
               subtitle: 'Ajoutez une adresse pour passer commande.',
               action: ElevatedButton.icon(
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const AddressFormScreen()),
                 ),
-                icon: const Icon(Icons.add, size: 18),
+                icon: const Icon(Symbols.add, size: 18),
                 label: const Text('Ajouter une adresse'),
                 style: ElevatedButton.styleFrom(shape: const StadiumBorder()),
               ),
@@ -63,7 +64,7 @@ class AddressesScreen extends ConsumerWidget {
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const AddressFormScreen()),
         ),
-        child: const Icon(Icons.add),
+        child: const Icon(Symbols.add),
       ),
     );
   }
@@ -151,7 +152,7 @@ class _AddressTile extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.check_circle, size: 14, color: AppColors.success),
+                        const Icon(Symbols.check_circle, size: 14, color: AppColors.success),
                         const SizedBox(width: 4),
                         Text('Par défaut', style: AppTextStyles.labelSmall.copyWith(color: AppColors.success)),
                       ],
@@ -163,7 +164,7 @@ class _AddressTile extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.location_on, size: 18, color: AppColors.secondary),
+                const Icon(Symbols.location_on, size: 18, color: AppColors.secondary),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -197,7 +198,7 @@ class _AddressTile extends ConsumerWidget {
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => AddressFormScreen(existingAddress: address)),
                     ),
-                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    icon: const Icon(Symbols.edit, size: 18),
                     label: const Text('Modifier'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.secondary,
@@ -208,7 +209,7 @@ class _AddressTile extends ConsumerWidget {
                   const Spacer(),
                   TextButton.icon(
                     onPressed: () => _confirmDelete(context, ref),
-                    icon: const Icon(Icons.delete_outline, size: 18),
+                    icon: const Icon(Symbols.delete, size: 18),
                     label: const Text('Supprimer'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.error,

@@ -13,6 +13,7 @@ import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/admin_promotion_model.dart';
 import '../providers/admin_promotions_provider.dart';
 import '../providers/admin_promotion_products_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminPromotionsScreen extends ConsumerWidget {
   const AdminPromotionsScreen({super.key});
@@ -28,7 +29,7 @@ class AdminPromotionsScreen extends ConsumerWidget {
           ? FloatingActionButton(
               backgroundColor: AppColors.primary,
               onPressed: () => _showFormDialog(context, ref),
-              child: const Icon(Icons.add, color: Colors.white),
+              child: const Icon(Symbols.add, color: Colors.white),
             )
           : null,
       body: promotionsState.when(
@@ -39,7 +40,7 @@ class AdminPromotionsScreen extends ConsumerWidget {
         ),
         data: (promotions) {
           if (promotions.isEmpty) {
-            return const EmptyState(icon: Icons.local_offer_outlined, title: 'Aucune promotion');
+            return const EmptyState(icon: Symbols.local_offer, title: 'Aucune promotion');
           }
 
           return ListView.separated(
@@ -242,7 +243,7 @@ class _PromotionTile extends ConsumerWidget {
             ),
             if (canManage)
               IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                icon: const Icon(Symbols.delete, color: AppColors.error, size: 20),
                 onPressed: () async {
                   final error = await ref.read(adminPromotionsListProvider.notifier).delete(promotion.id);
                   if (context.mounted) {

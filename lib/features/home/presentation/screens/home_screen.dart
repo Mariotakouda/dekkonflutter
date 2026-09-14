@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/dekkon_bottom_nav.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/dekkon_drawer.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../categories/presentation/providers/categories_provider.dart';
 import '../../../categories/presentation/screens/categories_screen.dart';
 import '../../../categories/presentation/widgets/category_chip.dart';
@@ -15,6 +15,13 @@ import '../../../products/presentation/providers/products_provider.dart';
 import '../../../products/presentation/widgets/product_card.dart';
 import '../widgets/section_header.dart';
 import '../widgets/promo_banner.dart';
+import '../../../../core/widgets/dekkon_logo.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+// Dégradé de la zone haute de l'accueil : orange vif en haut (sous la barre
+// de statut) qui s'éclaircit progressivement jusqu'au blanc.
+const _headerGradientTop = Color(0xFFFF7A2E);
+const _headerGradientBottom = Colors.white;
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -32,10 +39,29 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             // --- Zone fixe : ne scroll jamais ---
-            _HomeHeader(onNotificationsTap: () => context.push('/notifications')),
-            const SizedBox(height: 12),
-            _SearchBar(onTap: () => context.push('/products')),
-            const SizedBox(height: 8),
+            // Dégradé orange -> blanc derrière le header (plus de barre de
+            // recherche ici : la loupe est passée en icône dans le header).
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [_headerGradientTop, _headerGradientBottom],
+                  stops: [0.0, 0.85],
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _HomeHeader(
+                  onNotificationsTap: () => context.push('/notifications'),
+                  onSearchTap: () => context.go('/products'),
+                ),
+              ),
+            ),
 
             // --- Zone scrollable : tout le reste ---
             Expanded(
@@ -48,7 +74,7 @@ class HomeScreen extends ConsumerWidget {
                 child: ListView(
                   padding: const EdgeInsets.only(top: 12, bottom: 16),
                   children: [
-                    PromoBanner(onDiscoverTap: () => context.push('/products')),
+                    PromoBanner(onDiscoverTap: () => context.go('/products')),
                     const SizedBox(height: 24),
 
                     SectionHeader(title: 'Catégories', onSeeAll: () => context.push('/categories')),
@@ -138,7 +164,7 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    SectionHeader(title: 'Nouveautés', onSeeAll: () => context.push('/products')),
+                    SectionHeader(title: 'Nouveautés', onSeeAll: () => context.go('/products')),
                     const SizedBox(height: 12),
                     newProductsAsync.when(
                       loading: () => const SizedBox(height: 240, child: LoadingIndicator()),
@@ -153,101 +179,84 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const DekkonBottomNav(currentIndex: 0),
     );
   }
 }
 
 /// TopAppBar fixe, conforme à la maquette Stitch "accueil_dekkon" :
-/// icône notifications (avec pastille) à gauche, titre "Dekkon" centré,
-/// icône recherche à droite.
-class _HomeHeader extends StatelessWidget {
+/// logo à gauche, icônes recherche + notifications et avatar à droite.
+///
+/// Fond transparent : c'est le dégradé orange -> blanc défini dans
+/// [HomeScreen] qui se voit à travers. Icônes/avatar passés en blanc pour
+/// rester lisibles sur l'orange.
+class _HomeHeader extends ConsumerWidget {
   final VoidCallback onNotificationsTap;
+  final VoidCallback onSearchTap;
 
-  const _HomeHeader({required this.onNotificationsTap});
+  const _HomeHeader({required this.onNotificationsTap, required this.onSearchTap});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
-      ),
-      child: Row(
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined, color: AppColors.textSecondary),
-                onPressed: onNotificationsTap,
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.error,
-                    shape: BoxShape.circle,
-                    border: Border.fromBorderSide(BorderSide(color: AppColors.surface, width: 1)),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final user = authState.user;
+    final initial = (user?.customer?.firstName.isNotEmpty ?? false)
+        ? user!.customer!.firstName[0].toUpperCase()
+        : '?';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      child: SizedBox(
+        height: 44,
+        child: Row(
+          children: [
+            const DekkonLogo(height: 22),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Symbols.search, color: Colors.white),
+              onPressed: onSearchTap,
+            ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  icon: const Icon(Symbols.notifications, color: Colors.white),
+                  onPressed: onNotificationsTap,
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.error,
+                      shape: BoxShape.circle,
+                      border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1.5)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 4),
+            GestureDetector(
+              onTap: () => context.go('/profile'),
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundColor: AppColors.surfaceContainerHigh,
+                  child: Text(
+                    initial,
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
-            ],
-          ),
-          Expanded(
-            child: Center(
-              child: Text(
-                'Dekkon',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.secondary, // token "primary" (#00236F) du design system
-                ),
-              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.search, color: AppColors.textSecondary),
-            onPressed: () => context.push('/products'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchBar extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _SearchBar({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16), // "rounded-lg" du design system Stitch
-            border: Border.all(color: AppColors.border),
-            boxShadow: AppTheme.ambientShadow,
-          ),
-          child: Row(
-            children: const [
-              Icon(Icons.search, color: AppColors.outline),
-              SizedBox(width: 10),
-              Text('Rechercher un produit...', style: TextStyle(color: AppColors.textDisabled)),
-            ],
-          ),
+          ],
         ),
       ),
     );

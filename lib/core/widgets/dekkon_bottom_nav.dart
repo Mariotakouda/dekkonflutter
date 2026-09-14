@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../../features/cart/presentation/providers/cart_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class DekkonBottomNav extends ConsumerWidget {
   final int currentIndex;
@@ -11,11 +12,11 @@ class DekkonBottomNav extends ConsumerWidget {
   const DekkonBottomNav({super.key, required this.currentIndex});
 
   static const _items = [
-    (icon: Icons.home_outlined, iconFilled: Icons.home, label: 'Accueil', route: '/home'),
-    (icon: Icons.grid_view_outlined, iconFilled: Icons.grid_view, label: 'Catalogue', route: '/products'),
-    (icon: Icons.shopping_cart_outlined, iconFilled: Icons.shopping_cart, label: 'Panier', route: '/cart'),
-    (icon: Icons.receipt_long_outlined, iconFilled: Icons.receipt_long, label: 'Commandes', route: '/orders'),
-    (icon: Icons.person_outline, iconFilled: Icons.person, label: 'Profil', route: '/profile'),
+    (icon: Symbols.home, iconFilled: Symbols.home, label: 'Accueil', route: '/home'),
+    (icon: Symbols.grid_view, iconFilled: Symbols.grid_view, label: 'Catalogue', route: '/products'),
+    (icon: Symbols.shopping_cart, iconFilled: Symbols.shopping_cart, label: 'Panier', route: '/cart'),
+    (icon: Symbols.receipt_long, iconFilled: Symbols.receipt_long, label: 'Commandes', route: '/orders'),
+    (icon: Symbols.person, iconFilled: Symbols.person, label: 'Profil', route: '/profile'),
   ];
 
   @override
@@ -66,6 +67,7 @@ class DekkonBottomNav extends ConsumerWidget {
                           children: [
                             Icon(
                               isActive ? item.iconFilled : item.icon,
+                              fill: isActive ? 1 : 0,
                               color: isActive
                                   ? AppColors.onPrimary
                                   : AppColors.textDisabled,

@@ -4,8 +4,10 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Bannière promotionnelle de l'accueil — utilise l'image "accueil"
-/// (assets/images/accueil.jpg) en arrière-plan, avec un dégradé clair
-/// beige pour garder le texte lisible, comme sur la maquette Stitch.
+/// (assets/images/accueil.jpg) en arrière-plan. Le dégradé beige ne couvre
+/// que la zone du texte (environ les 45 premiers % de la largeur) et
+/// redescend à 0% d'opacité avant d'atteindre l'image, pour qu'elle reste
+/// nette et visible sur la partie droite au lieu d'être voilée de gris.
 class PromoBanner extends StatelessWidget {
   final VoidCallback? onDiscoverTap;
 
@@ -29,7 +31,8 @@ class PromoBanner extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          // Dégradé clair pour garantir la lisibilité du texte sombre.
+          // Dégradé resserré sur la zone du texte, qui retombe à 0%
+          // d'opacité avant l'image : celle-ci reste donc nette, sans voile.
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -37,9 +40,11 @@ class PromoBanner extends StatelessWidget {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    AppColors.backgroundBeige.withValues(alpha: 0.96),
-                    AppColors.backgroundBeige.withValues(alpha: 0.55),
+                    AppColors.backgroundBeige.withValues(alpha: 0.95),
+                    AppColors.backgroundBeige.withValues(alpha: 0.75),
+                    AppColors.backgroundBeige.withValues(alpha: 0.0),
                   ],
+                  stops: const [0.0, 0.42, 0.62],
                 ),
               ),
             ),

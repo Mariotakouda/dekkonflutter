@@ -10,6 +10,7 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../data/models/notifications_model.dart';
 import '../providers/notifications_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -38,7 +39,7 @@ class NotificationsScreen extends ConsumerWidget {
         data: (notifications) {
           if (notifications.isEmpty) {
             return const EmptyState(
-              icon: Icons.notifications_none,
+              icon: Symbols.notifications,
               title: 'Aucune notification',
             );
           }
@@ -134,12 +135,12 @@ class NotificationsScreen extends ConsumerWidget {
 
   IconData _iconForType(String type) {
     return switch (type) {
-      'order_confirmed' => Icons.check_circle_outline,
-      'payment_received' => Icons.payment_outlined,
-      'order_shipped' => Icons.local_shipping_outlined,
-      'order_delivered' => Icons.done_all,
-      'low_stock_alert' => Icons.warning_amber_outlined,
-      _ => Icons.notifications_none,
+      'order_confirmed' => Symbols.check_circle,
+      'payment_received' => Symbols.payment,
+      'order_shipped' => Symbols.local_shipping,
+      'order_delivered' => Symbols.done_all,
+      'low_stock_alert' => Symbols.warning_amber,
+      _ => Symbols.notifications,
     };
   }
 }

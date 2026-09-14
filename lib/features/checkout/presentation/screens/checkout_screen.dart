@@ -14,6 +14,7 @@ import '../../../addresses/presentation/providers/addresses_provider.dart';
 import '../../../addresses/presentation/screens/addresses_screen.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
 import '../providers/checkout_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -208,14 +209,14 @@ class _AddressCard extends StatelessWidget {
         child: address == null
             ? Row(
                 children: const [
-                  Icon(Icons.add_location_alt_outlined, color: AppColors.primary),
+                  Icon(Symbols.add_location_alt, color: AppColors.primary),
                   SizedBox(width: 10),
                   Text('Sélectionner une adresse'),
                 ],
               )
             : Row(
                 children: [
-                  const Icon(Icons.location_on_outlined, color: AppColors.primary),
+                  const Icon(Symbols.location_on, color: AppColors.primary),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -226,7 +227,7 @@ class _AddressCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: AppColors.textDisabled),
+                  const Icon(Symbols.chevron_right, color: AppColors.textDisabled),
                 ],
               ),
       ),
@@ -258,7 +259,7 @@ class _PaymentOption extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                selected ? Symbols.radio_button_checked : Symbols.radio_button_unchecked,
                 color: selected ? AppColors.primary : AppColors.textSecondary,
                 size: 20,
               ),

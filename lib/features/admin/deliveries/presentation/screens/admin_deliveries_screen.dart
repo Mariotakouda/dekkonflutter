@@ -12,6 +12,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/admin_delivery_model.dart';
 import '../providers/admin_deliveries_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminDeliveriesScreen extends ConsumerStatefulWidget {
   const AdminDeliveriesScreen({super.key});
@@ -87,7 +88,7 @@ class _AdminDeliveriesScreenState extends ConsumerState<AdminDeliveriesScreen> {
                         onRetry: () => ref.read(adminDeliveryListProvider.notifier).loadFirstPage(),
                       )
                     : state.deliveries.isEmpty
-                        ? const EmptyState(icon: Icons.local_shipping_outlined, title: 'Aucune livraison')
+                        ? const EmptyState(icon: Symbols.local_shipping, title: 'Aucune livraison')
                         : ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(16),
@@ -204,7 +205,7 @@ class _DeliveryTile extends ConsumerWidget {
                 const SizedBox(width: 8),
                 IconButton(
                   tooltip: 'Marquer comme échouée',
-                  icon: const Icon(Icons.report_problem_outlined, color: AppColors.error),
+                  icon: const Icon(Symbols.report_problem, color: AppColors.error),
                   onPressed: isProcessing ? null : () => _showFailDialog(context, ref),
                 ),
               ],

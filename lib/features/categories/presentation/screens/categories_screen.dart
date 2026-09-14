@@ -9,8 +9,10 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/gradient_header.dart';
 import '../../data/models/categories_model.dart';
 import '../providers/categories_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class CategoriesScreen extends ConsumerWidget {
   /// Titre de l'écran. Par défaut 'Catégories' (niveau racine).
@@ -30,24 +32,57 @@ class CategoriesScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(title ?? 'Catégories')),
-      body: providedCategories != null
-          ? _CategoriesBody(categories: providedCategories, parentId: parentId, parentName: parentName)
-          : Builder(
-              builder: (context) {
-                final categoriesAsync = ref.watch(categoriesProvider);
-                return categoriesAsync.when(
-                  loading: () => const LoadingIndicator(),
-                  error: (e, _) => ErrorView(
-                    message: 'Impossible de charger les catégories.',
-                    onRetry: () => ref.invalidate(categoriesProvider),
-                  ),
-                  data: (cats) => cats.isEmpty
-                      ? const EmptyState(icon: Icons.category_outlined, title: 'Aucune catégorie')
-                      : _CategoriesBody(categories: cats, parentId: null, parentName: null),
-                );
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Dégradé orange -> blanc commun à toutes les pages principales.
+            GradientHeader(
+              child: SizedBox(
+                height: 56,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Symbols.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                    Expanded(
+                      child: Text(
+                        title ?? 'Catégories',
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 48), // équilibre visuel avec la flèche retour
+                  ],
+                ),
+              ),
             ),
+            Expanded(
+              child: providedCategories != null
+                  ? _CategoriesBody(categories: providedCategories, parentId: parentId, parentName: parentName)
+                  : Builder(
+                      builder: (context) {
+                        final categoriesAsync = ref.watch(categoriesProvider);
+                        return categoriesAsync.when(
+                          loading: () => const LoadingIndicator(),
+                          error: (e, _) => ErrorView(
+                            message: 'Impossible de charger les catégories.',
+                            onRetry: () => ref.invalidate(categoriesProvider),
+                          ),
+                          data: (cats) => cats.isEmpty
+                              ? const EmptyState(icon: Symbols.category, title: 'Aucune catégorie')
+                              : _CategoriesBody(categories: cats, parentId: null, parentName: null),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -106,7 +141,7 @@ class _CategoriesBodyState extends State<_CategoriesBody> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.search, color: AppColors.outline, size: 20),
+                const Icon(Symbols.search, color: AppColors.outline, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
@@ -129,7 +164,7 @@ class _CategoriesBodyState extends State<_CategoriesBody> {
         Expanded(
           child: filtered.isEmpty
               ? const EmptyState(
-                  icon: Icons.search_off_rounded,
+                  icon: Symbols.search_off_rounded,
                   title: 'Aucune catégorie trouvée',
                 )
               : ListView.separated(
@@ -217,7 +252,7 @@ class _CategoryAccordionTile extends StatelessWidget {
                               ? CachedNetworkImage(imageUrl: category.imageUrl!, fit: BoxFit.cover)
                               : Container(
                                   color: AppColors.surface,
-                                  child: const Icon(Icons.category_outlined, color: AppColors.primaryDark),
+                                  child: const Icon(Symbols.category, color: AppColors.primaryDark),
                                 ),
                         ),
                       ),
@@ -254,10 +289,10 @@ class _CategoryAccordionTile extends StatelessWidget {
                     AnimatedRotation(
                       turns: expanded ? 0.5 : 0,
                       duration: const Duration(milliseconds: 200),
-                      child: const Icon(Icons.expand_more, color: AppColors.primaryDark),
+                      child: const Icon(Symbols.expand_more, color: AppColors.primaryDark),
                     )
                   else
-                    const Icon(Icons.chevron_right, color: AppColors.textDisabled),
+                    const Icon(Symbols.chevron_right, color: AppColors.textDisabled),
                 ],
               ),
             ),
@@ -286,7 +321,7 @@ class _CategoryAccordionTile extends StatelessWidget {
                                     Expanded(
                                       child: Text(sub.name, style: AppTextStyles.bodyMedium),
                                     ),
-                                    const Icon(Icons.chevron_right, size: 18, color: AppColors.textDisabled),
+                                    const Icon(Symbols.chevron_right, size: 18, color: AppColors.textDisabled),
                                   ],
                                 ),
                               ),

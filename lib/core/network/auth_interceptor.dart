@@ -24,8 +24,18 @@ class AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      await SecureStorage.deleteToken();
-      onUnauthorized?.call();
+      // Ne déconnecter que si la requête qui a échoué avait bien envoyé un
+      // token. Un 401 sur une requête partie SANS Authorization (ex: lecture
+      // du secure storage pas encore prête au tout premier appel concurrent)
+      // ne signifie pas que le token stocké est invalide : le supprimer dans
+      // ce cas déconnecte l'utilisateur à tort (ex: juste après avoir validé
+      // une commande, en pleine navigation).
+      final hadToken = err.requestOptions.headers['Authorization'] != null;
+
+      if (hadToken) {
+        await SecureStorage.deleteToken();
+        onUnauthorized?.call();
+      }
     }
 
     return handler.next(err);

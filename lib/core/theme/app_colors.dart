@@ -1,72 +1,71 @@
 import 'package:flutter/material.dart';
 
-/// Palette DEKKON — basée sur le design system Google Stitch v2
-/// "Dekkon Design System" (bleu corporate, voir DESIGN.md fourni par le client).
+/// Palette DEKKON — nouvelle charte "Orange / Noir profond / Blanc cassé"
+/// (remplace l'ancien design system bleu corporate Google Stitch v2).
 class AppColors {
   AppColors._();
 
-  // Couleurs principales — Bleu Action (CTA d'achat : "Acheter", "Ajouter au
-  // panier", badges, onglet actif de la nav)
-  static const Color primary = Color(0xFF0058BE);
-  static const Color primaryLight = Color(0xFF2170E4);
-  static const Color primaryDark = Color(0xFF00236F); // brand navy — logo, titres
-  static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color primaryContainer = Color(0xFFD8E2FF);
-  static const Color onPrimaryContainer = Color(0xFF00236F);
+  // Couleurs principales — Orange (boutons, éléments actifs, illustrations,
+  // accents, onglet actif de la nav)
+  static const Color primary = Color(0xFFF4530C); // Orange principal
+  static const Color primaryLight = Color(0xFFF2AB84); // Orange pâle
+  static const Color primaryDark = Color(0xFFD45C28); // Orange clair (variante)
+  static const Color onPrimary = Color(0xFFFDFBF9);
+  static const Color primaryContainer = Color(0xFFFBDDCE);
+  static const Color onPrimaryContainer = Color(0xFF181614);
 
-  // Secondaire — Bleu marine confiance (boutons outline, focus, actions
-  // secondaires, sécurité/paiement)
-  static const Color secondary = Color(0xFF00236F);
-  static const Color secondaryLight = Color(0xFF1E3A8A);
-  static const Color secondaryDark = Color(0xFF001233);
-  static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color secondaryContainer = Color(0xFFDCE1FF);
-  static const Color onSecondaryContainer = Color(0xFF264191);
+  // Secondaire — Noir profond (fonds de présentation, certains boutons,
+  // actions secondaires)
+  static const Color secondary = Color(0xFF0A0402); // Noir profond
+  static const Color secondaryLight = Color(0xFF181614); // Noir UI
+  static const Color secondaryDark = Color(0xFF000000);
+  static const Color onSecondary = Color(0xFFFDFBF9);
+  static const Color secondaryContainer = Color(0xFFEAE7E5);
+  static const Color onSecondaryContainer = Color(0xFF181614);
 
   // Texte
-  static const Color textPrimary = Color(0xFF121C2A); // on-surface
-  static const Color textSecondary = Color(0xFF444651); // on-surface-variant
-  static const Color textDisabled = Color(0xFF9AA3B6);
+  static const Color textPrimary = Color(0xFF181614); // Noir UI
+  static const Color textSecondary = Color(0xFF777471); // Gris moyen
+  static const Color textDisabled = Color(0xFFACA9A5);
 
   // Neutres / surfaces
-  static const Color background = Color(0xFFF8F9FF);
-  static const Color backgroundLightGray = Color(0xFFF9FAFB);
-  static const Color backgroundBeige = Color(0xFFF5F5DC);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLow = Color(0xFFEFF4FF);
-  static const Color surfaceContainer = Color(0xFFE6EEFF);
-  static const Color surfaceContainerHigh = Color(0xFFDEE9FC);
-  static const Color border = Color(0xFFC5C5D3); // outline-variant
-  static const Color outline = Color(0xFF757682);
-  static const Color divider = Color(0xFFE6EEFF);
+  static const Color background = Color(0xFFFDFBF9); // Blanc cassé
+  static const Color backgroundLightGray = Color(0xFFF2F0ED);
+  static const Color backgroundBeige = Color(0xFFE4E3DF);
+  static const Color surface = Color(0xFFFDFBF9);
+  static const Color surfaceContainerLow = Color(0xFFF2F0ED);
+  static const Color surfaceContainer = Color(0xFFE4E3DF);
+  static const Color surfaceContainerHigh = Color(0xFFE8E7E3);
+  static const Color border = Color(0xFFE4E3DF); // Gris très clair
+  static const Color outline = Color(0xFF777471); // Gris moyen
+  static const Color divider = Color(0xFFE4E3DF);
 
   // Sémantiques
-  static const Color success = Color(0xFF006E1C);
-  static const Color successContainer = Color(0xFF76DA75);
-  static const Color warning = Color(0xFFB45309);
+  static const Color success = Color(0xFF35B878); // Vert succès
+  static const Color successContainer = Color(0xFFD5EEDF);
+  static const Color warning = Color(0xFFD45C28);
   static const Color error = Color(0xFFBA1A1A);
-  static const Color errorContainer = Color(0xFFFFDAD6);
-  static const Color onError = Color(0xFFFFFFFF);
+  static const Color errorContainer = Color(0xFFF3D9D8);
+  static const Color onError = Color(0xFFFDFBF9);
   static const Color onErrorContainer = Color(0xFF93000A);
   static const Color info = primaryLight;
 
   // Urgence / promotions
-  static const Color promotionYellow = Color(0xFFFFD600);
+  static const Color promotionYellow = Color(0xFFF2AB84); // Orange pâle
   static const Color promotionRed = Color(0xFFE63946);
 
   // États des commandes (mapping direct avec OrderStatus backend)
   static const Color statusPending = Color(0xFF9E9E9E);
-  static const Color statusConfirmed = secondaryLight;
+  static const Color statusConfirmed = primaryDark;
   static const Color statusProcessing = primary;
   static const Color statusDelivered = success;
   static const Color statusCancelled = error;
 
   // Overlay / ombres
-  static const Color overlay = Color(0x66000000);
-  static const Color shimmerBase = Color(0xFFE8EAED);
-  static const Color shimmerHighlight = Color(0xFFF5F6F8);
+  static const Color overlay = Color(0x660A0402);
+  static const Color shimmerBase = Color(0xFFE4E3DF); // Gris très clair
+  static const Color shimmerHighlight = Color(0xFFF3F1EF);
 
-  /// Ombre "whisper-soft" utilisée par le design system Stitch pour les
-  /// cartes et éléments interactifs (rgba(17,24,39,0.05)).
-  static const Color ambientShadow = Color(0x0D111827);
+  /// Ombre "whisper-soft" utilisée pour les cartes et éléments interactifs.
+  static const Color ambientShadow = Color(0x0D181614);
 }

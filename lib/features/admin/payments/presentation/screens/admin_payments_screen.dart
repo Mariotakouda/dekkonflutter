@@ -13,6 +13,7 @@ import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/admin_payment_model.dart';
 import '../providers/admin_payments_provider.dart';
 import 'admin_payment_detail_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminPaymentsScreen extends ConsumerStatefulWidget {
   const AdminPaymentsScreen({super.key});
@@ -87,7 +88,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
                         onRetry: () => ref.read(adminPaymentListProvider.notifier).loadFirstPage(),
                       )
                     : state.payments.isEmpty
-                        ? const EmptyState(icon: Icons.payments_outlined, title: 'Aucun paiement')
+                        ? const EmptyState(icon: Symbols.payments, title: 'Aucun paiement')
                         : ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(16),

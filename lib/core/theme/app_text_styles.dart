@@ -56,18 +56,20 @@ class AppTextStyles {
         height: 1.4,
       );
 
-  // Libellés / boutons (label-sm du design system pour labelSmall)
+  // Libellés / boutons
+  // labelLarge = boutons (SemiBold) ; labelMedium/labelSmall = labels,
+  // informations (Medium), conformément à l'échelle typographique du client.
   static TextStyle get labelLarge => _base.copyWith(
         fontSize: 16,
         fontWeight: FontWeight.w600,
       );
   static TextStyle get labelMedium => _base.copyWith(
         fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
       );
   static TextStyle get labelSmall => _base.copyWith(
         fontSize: 12,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
         height: 16 / 12,
       );
 

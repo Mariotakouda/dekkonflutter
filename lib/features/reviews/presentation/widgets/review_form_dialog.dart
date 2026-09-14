@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../providers/reviews_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 Future<void> showReviewFormDialog(BuildContext context, {required String orderItemId, required String productName}) {
   return showDialog(
@@ -45,7 +46,8 @@ class _ReviewFormDialogState extends ConsumerState<ReviewFormDialog> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (i) => IconButton(
                   icon: Icon(
-                    i < _rating ? Icons.star : Icons.star_border,
+                    Symbols.star,
+                    fill: i < _rating ? 1 : 0,
                     color: AppColors.secondary,
                   ),
                   onPressed: () => setState(() => _rating = i + 1),

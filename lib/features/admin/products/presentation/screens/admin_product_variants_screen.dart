@@ -9,6 +9,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../data/models/admin_product_model.dart';
 import '../providers/admin_products_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminProductVariantsScreen extends ConsumerWidget {
   final String productId;
@@ -183,7 +184,7 @@ class AdminProductVariantsScreen extends ConsumerWidget {
               children: [
                 CustomButton(
                   label: 'Ajouter une variante',
-                  icon: Icons.add,
+                  icon: Symbols.add,
                   onPressed: () => _showVariantDialog(context, ref),
                   width: double.infinity,
                 ),
@@ -217,16 +218,16 @@ class AdminProductVariantsScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.inventory_2_outlined, size: 18, color: AppColors.primary),
+                                    icon: const Icon(Symbols.inventory_2, size: 18, color: AppColors.primary),
                                     tooltip: 'Ajuster le stock',
                                     onPressed: () => _showStockDialog(context, ref, variant),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.edit_outlined, size: 18),
+                                    icon: const Icon(Symbols.edit, size: 18),
                                     onPressed: () => _showVariantDialog(context, ref, existing: variant),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                                    icon: const Icon(Symbols.delete, size: 18, color: AppColors.error),
                                     onPressed: () async {
                                       final error =
                                           await ref.read(adminProductAssetsProvider.notifier).deleteVariant(productId, variant.id);

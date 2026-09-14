@@ -9,6 +9,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../providers/admin_products_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminProductImagesScreen extends ConsumerWidget {
   final String productId;
@@ -49,7 +50,7 @@ class AdminProductImagesScreen extends ConsumerWidget {
               children: [
                 CustomButton(
                   label: 'Ajouter une image',
-                  icon: Icons.add_photo_alternate_outlined,
+                  icon: Symbols.add_photo_alternate,
                   isLoading: isSubmitting,
                   onPressed: isSubmitting ? null : () => _pickAndUpload(context, ref, isPrimary: images.isEmpty),
                   width: double.infinity,
@@ -57,7 +58,7 @@ class AdminProductImagesScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Expanded(
                   child: images.isEmpty
-                      ? const EmptyState(icon: Icons.image_outlined, title: 'Aucune image pour ce produit')
+                      ? const EmptyState(icon: Symbols.image, title: 'Aucune image pour ce produit')
                       : GridView.builder(
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
@@ -108,7 +109,7 @@ class AdminProductImagesScreen extends ConsumerWidget {
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
                                       decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
-                                      child: const Icon(Icons.close, size: 14, color: Colors.white),
+                                      child: const Icon(Symbols.close, size: 14, color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -130,7 +131,7 @@ class AdminProductImagesScreen extends ConsumerWidget {
                                       child: Container(
                                         padding: const EdgeInsets.all(4),
                                         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                        child: const Icon(Icons.star_border, size: 14, color: AppColors.secondary),
+                                        child: const Icon(Symbols.star, size: 14, color: AppColors.secondary),
                                       ),
                                     ),
                                   ),

@@ -11,6 +11,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../products/data/models/admin_product_model.dart';
 import '../providers/admin_categories_provider.dart';
 import 'admin_category_attributes_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminCategoriesScreen extends ConsumerWidget {
   const AdminCategoriesScreen({super.key});
@@ -24,7 +25,7 @@ class AdminCategoriesScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () => _showFormDialog(context, ref),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Symbols.add, color: Colors.white),
       ),
       body: categoriesState.when(
         loading: () => const LoadingIndicator(),
@@ -34,7 +35,7 @@ class AdminCategoriesScreen extends ConsumerWidget {
         ),
         data: (categories) {
           if (categories.isEmpty) {
-            return const EmptyState(icon: Icons.category_outlined, title: 'Aucune catégorie');
+            return const EmptyState(icon: Symbols.category, title: 'Aucune catégorie');
           }
 
           return ListView.builder(
@@ -177,7 +178,7 @@ class _CategoryGroup extends ConsumerWidget {
             color: AppColors.secondary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(Icons.folder_outlined, color: AppColors.secondary, size: 20),
+          child: const Icon(Symbols.folder, color: AppColors.secondary, size: 20),
         ),
         title: Text(category.name, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
         subtitle: Text('${category.productsCount ?? 0} produit(s)', style: AppTextStyles.caption),
@@ -185,7 +186,7 @@ class _CategoryGroup extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.tune, size: 18),
+              icon: const Icon(Symbols.tune, size: 18),
               tooltip: 'Attributs de la catégorie',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -194,16 +195,16 @@ class _CategoryGroup extends ConsumerWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 18),
+              icon: const Icon(Symbols.edit, size: 18),
               onPressed: () => AdminCategoriesScreen._showFormDialog(context, ref, existing: category),
             ),
             IconButton(
-              icon: const Icon(Icons.add, size: 18, color: AppColors.primary),
+              icon: const Icon(Symbols.add, size: 18, color: AppColors.primary),
               tooltip: 'Ajouter une sous-catégorie',
               onPressed: () => AdminCategoriesScreen._showFormDialog(context, ref, parentIdFixed: category.id),
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 18),
+              icon: const Icon(Symbols.delete, color: AppColors.error, size: 18),
               onPressed: () async {
                 final error = await ref.read(adminCategoriesListProvider.notifier).delete(category.id);
                 if (context.mounted) {
@@ -223,7 +224,7 @@ class _CategoryGroup extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.tune, size: 18),
+                        icon: const Icon(Symbols.tune, size: 18),
                         tooltip: 'Attributs de la catégorie',
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute(
@@ -233,11 +234,11 @@ class _CategoryGroup extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        icon: const Icon(Symbols.edit, size: 18),
                         onPressed: () => AdminCategoriesScreen._showFormDialog(context, ref, existing: child),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                        icon: const Icon(Symbols.delete, size: 18, color: AppColors.error),
                         onPressed: () async {
                           final error = await ref.read(adminCategoriesListProvider.notifier).delete(child.id);
                           if (context.mounted) {

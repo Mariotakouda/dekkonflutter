@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-class DekkonDrawer extends StatelessWidget {
+class DekkonDrawer extends ConsumerWidget {
   const DekkonDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
       backgroundColor: AppColors.surface,
       child: SafeArea(
@@ -35,7 +38,7 @@ class DekkonDrawer extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   _DrawerItem(
-                    icon: Icons.favorite_border,
+                    icon: Symbols.favorite,
                     label: 'Favoris',
                     onTap: () {
                       Navigator.pop(context);
@@ -43,7 +46,7 @@ class DekkonDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.location_on_outlined,
+                    icon: Symbols.location_on,
                     label: 'Mes adresses',
                     onTap: () {
                       Navigator.pop(context);
@@ -51,7 +54,7 @@ class DekkonDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.local_offer_outlined,
+                    icon: Symbols.local_offer,
                     label: 'Codes promo',
                     onTap: () {
                       Navigator.pop(context);
@@ -63,7 +66,7 @@ class DekkonDrawer extends StatelessWidget {
                     child: Divider(height: 1),
                   ),
                   _DrawerItem(
-                    icon: Icons.settings_outlined,
+                    icon: Symbols.settings,
                     label: 'Paramètres',
                     onTap: () {
                       Navigator.pop(context);
@@ -71,7 +74,7 @@ class DekkonDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.help_outline,
+                    icon: Symbols.help,
                     label: 'Aide & Support',
                     onTap: () {
                       Navigator.pop(context);
@@ -79,7 +82,7 @@ class DekkonDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.description_outlined,
+                    icon: Symbols.description,
                     label: 'Conditions & Confidentialité',
                     onTap: () {
                       Navigator.pop(context);
@@ -92,13 +95,45 @@ class DekkonDrawer extends StatelessWidget {
 
             const Divider(height: 1),
             _DrawerItem(
-              icon: Icons.logout,
+              icon: Symbols.logout,
               label: 'Déconnexion',
               iconColor: AppColors.error,
               labelColor: AppColors.error,
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: brancher sur la logique de déconnexion (provider auth).
+              onTap: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  // `dialogContext` (et non le `context` de la page hôte) :
+                  // sinon Navigator.pop dépile la page qui contient le drawer
+                  // dans go_router au lieu de fermer juste la popup — ce qui
+                  // vide toute la pile de navigation de cet onglet (écran
+                  // blanc + "You have popped the last page off of the stack").
+                  builder: (dialogContext) => AlertDialog(
+                    title: const Text('Se déconnecter ?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        child: const Text('Annuler'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, true),
+                        child: const Text('Déconnexion'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmed != true) return;
+
+                // On ferme d'abord le drawer, PUIS on déconnecte : appeler
+                // logout() avant peut invalider le context du Scaffold qui
+                // héberge le drawer et laisser un écran vide/figé le temps
+                // que Navigator.pop tente de s'exécuter sur un arbre déjà
+                // en cours de reconstruction (redirect vers /auth).
+                if (context.mounted) Navigator.pop(context);
+
+                await ref.read(authNotifierProvider.notifier).logout();
+
+                if (context.mounted) context.go('/auth');
               },
             ),
             const SizedBox(height: 12),

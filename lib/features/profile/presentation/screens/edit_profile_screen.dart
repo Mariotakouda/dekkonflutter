@@ -7,6 +7,7 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -114,7 +115,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: AppColors.surface, width: 2),
                             ),
-                            child: const Icon(Icons.edit, size: 14, color: Colors.white),
+                            child: const Icon(Symbols.edit, size: 14, color: Colors.white),
                           ),
                         ),
                       ],
@@ -155,14 +156,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     CustomTextField(
                       controller: _firstNameController,
                       label: 'Prénom',
-                      prefixIcon: const Icon(Icons.person_outline, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.person, color: AppColors.outline),
                       validator: (v) => Validators.required(v, field: 'Le prénom'),
                     ),
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: _lastNameController,
                       label: 'Nom',
-                      prefixIcon: const Icon(Icons.person_outline, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.person, color: AppColors.outline),
                       validator: (v) => Validators.required(v, field: 'Le nom'),
                     ),
                     const SizedBox(height: 16),
@@ -170,7 +171,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       controller: _emailController,
                       label: 'Email',
                       keyboardType: TextInputType.emailAddress,
-                      prefixIcon: const Icon(Icons.email_outlined, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.email, color: AppColors.outline),
                       validator: Validators.email,
                     ),
                     const SizedBox(height: 16),
@@ -178,7 +179,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       controller: _phoneController,
                       label: 'Téléphone',
                       keyboardType: TextInputType.phone,
-                      prefixIcon: const Icon(Icons.call_outlined, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.call, color: AppColors.outline),
                       validator: Validators.phone,
                     ),
                   ],

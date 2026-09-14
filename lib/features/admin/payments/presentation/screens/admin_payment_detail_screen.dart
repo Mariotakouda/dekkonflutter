@@ -11,6 +11,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/admin_payments_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminPaymentDetailScreen extends ConsumerWidget {
   final String paymentId;
@@ -81,7 +82,7 @@ class AdminPaymentDetailScreen extends ConsumerWidget {
                               color: const Color(0xFF0277BD).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.receipt_long_outlined, color: Color(0xFF0277BD), size: 20),
+                            child: const Icon(Symbols.receipt_long, color: Color(0xFF0277BD), size: 20),
                           ),
                           const SizedBox(width: 12),
                           Text(orderNumber, style: AppTextStyles.h4),

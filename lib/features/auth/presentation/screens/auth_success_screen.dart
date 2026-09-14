@@ -4,12 +4,15 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/router/app_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// Écran affiché juste après une inscription réussie, conforme à la
 /// maquette "succès_authentification_dekkon" : icône de succès, message
 /// de confirmation et bouton "Commencer" qui mène à l'accueil.
 class AuthSuccessScreen extends StatelessWidget {
-  const AuthSuccessScreen({super.key});
+  final String? redirectTo;
+
+  const AuthSuccessScreen({super.key, this.redirectTo});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class AuthSuccessScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.check_circle,
+                    Symbols.check_circle,
                     size: 64,
                     color: AppColors.primaryLight,
                   ),
@@ -61,7 +64,10 @@ class AuthSuccessScreen extends StatelessWidget {
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    onPressed: () => context.go(AppRoutes.home),
+                    onPressed: () {
+                      final hasRedirect = redirectTo != null && redirectTo!.isNotEmpty;
+                      context.go(hasRedirect ? redirectTo! : AppRoutes.home);
+                    },
                     child: Text('Commencer', style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
                   ),
                 ),

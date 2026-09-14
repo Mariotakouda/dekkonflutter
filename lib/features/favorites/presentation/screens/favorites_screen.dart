@@ -8,6 +8,7 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../products/presentation/widgets/product_grid.dart';
 import '../providers/favorites_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -35,7 +36,7 @@ class FavoritesScreen extends ConsumerWidget {
 
           if (products.isEmpty) {
             return const EmptyState(
-              icon: Icons.favorite_border,
+              icon: Symbols.favorite,
               title: 'Aucun favori',
               subtitle: 'Ajoutez des produits à vos favoris pour les retrouver ici.',
             );

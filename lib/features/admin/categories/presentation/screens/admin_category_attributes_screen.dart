@@ -9,6 +9,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../../products/data/models/admin_product_model.dart';
 import '../providers/admin_categories_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminCategoryAttributesScreen extends ConsumerWidget {
   final String categoryId;
@@ -157,7 +158,7 @@ class AdminCategoryAttributesScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 CustomButton(
                   label: 'Ajouter un attribut',
-                  icon: Icons.add,
+                  icon: Symbols.add,
                   onPressed: () => _showFormDialog(context, ref),
                   width: double.infinity,
                 ),
@@ -196,11 +197,11 @@ class AdminCategoryAttributesScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.edit_outlined, size: 18),
+                                    icon: const Icon(Symbols.edit, size: 18),
                                     onPressed: () => _showFormDialog(context, ref, existing: attribute),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                                    icon: const Icon(Symbols.delete, size: 18, color: AppColors.error),
                                     onPressed: () async {
                                       final error = await ref
                                           .read(adminCategoryAttributesProvider.notifier)

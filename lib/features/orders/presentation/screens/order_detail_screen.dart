@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -11,6 +12,7 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../reviews/presentation/widgets/review_form_dialog.dart';
 import '../providers/orders_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// Les 5 étapes du suivi de commande, conformes à "d_tail_commande_dekkon".
 const _timelineSteps = ['Commande passée', 'Confirmée', 'Préparation', 'En livraison', 'Livrée'];
@@ -74,8 +76,18 @@ class OrderDetailScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
-                        onPressed: () => Navigator.of(context).maybePop(),
+                        icon: const Icon(Symbols.arrow_back, color: AppColors.textSecondary),
+                        onPressed: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else {
+                            // Arrivé ici juste après un checkout : celui-ci
+                            // utilise context.go() qui vide la pile de
+                            // navigation, donc il n'y a rien à pop. On
+                            // retombe sur la liste des commandes.
+                            context.go('/orders');
+                          }
+                        },
                       ),
                       Expanded(
                         child: Text(
@@ -136,7 +148,7 @@ class OrderDetailScreen extends ConsumerWidget {
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
-                                      isCancelled ? Icons.cancel_outlined : Icons.inventory_2,
+                                      isCancelled ? Symbols.cancel : Symbols.inventory_2,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -190,7 +202,7 @@ class OrderDetailScreen extends ConsumerWidget {
                                           color: AppColors.surfaceContainerLow,
                                           borderRadius: BorderRadius.circular(10),
                                         ),
-                                        child: const Icon(Icons.shopping_bag_outlined, color: AppColors.primaryDark),
+                                        child: const Icon(Symbols.shopping_bag, color: AppColors.primaryDark),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
@@ -230,7 +242,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         // --- Adresse de livraison ---
                         if (order.address != null) ...[
                           _InfoCard(
-                            icon: Icons.location_on_outlined,
+                            icon: Symbols.location_on,
                             title: 'Adresse de livraison',
                             child: Text(
                               '${order.address!['recipient_name']}\n${order.address!['address_line']}\n${order.address!['district']}, ${order.address!['city']}',
@@ -243,7 +255,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         // --- Paiement ---
                         if (order.payment != null) ...[
                           _InfoCard(
-                            icon: Icons.credit_card,
+                            icon: Symbols.credit_card,
                             title: 'Paiement',
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +263,7 @@ class OrderDetailScreen extends ConsumerWidget {
                                 Row(
                                   children: [
                                     Icon(
-                                      paymentStatus == 'SUCCESS' ? Icons.check_circle_outline : Icons.error_outline,
+                                      paymentStatus == 'SUCCESS' ? Symbols.check_circle : Symbols.error,
                                       size: 16,
                                       color: paymentStatus == 'SUCCESS' ? AppColors.success : AppColors.error,
                                     ),
@@ -388,7 +400,7 @@ class _TimelineStep extends StatelessWidget {
                   border: Border.all(color: (done || current) ? activeColor : AppColors.border, width: 2),
                 ),
                 child: done
-                    ? const Icon(Icons.check, size: 12, color: Colors.white)
+                    ? const Icon(Symbols.check, size: 12, color: Colors.white)
                     : current
                         ? Center(child: Container(width: 8, height: 8, decoration: BoxDecoration(color: activeColor, shape: BoxShape.circle)))
                         : null,

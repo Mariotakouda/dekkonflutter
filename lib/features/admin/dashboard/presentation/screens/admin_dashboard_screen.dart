@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/admin_permissions.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -23,7 +24,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
     final allTiles = <_AdminTileConfig>[
       const _AdminTileConfig(
-        icon: Icons.receipt_long_rounded,
+        icon: Symbols.receipt_long_rounded,
         label: 'Commandes',
         subtitle: 'Suivi et traitement',
         route: '/admin/orders',
@@ -32,7 +33,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         badgeText: '12',
       ),
       const _AdminTileConfig(
-        icon: Icons.inventory_2_rounded,
+        icon: Symbols.inventory_2_rounded,
         label: 'Stock',
         subtitle: 'Inventaires & Alertes',
         route: '/admin/inventory',
@@ -40,7 +41,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.inventoryView],
       ),
       const _AdminTileConfig(
-        icon: Icons.grid_view_rounded,
+        icon: Symbols.grid_view_rounded,
         label: 'Produits',
         subtitle: 'Catalogue & Prix',
         route: '/admin/products',
@@ -48,7 +49,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.productsManage],
       ),
       const _AdminTileConfig(
-        icon: Icons.category_rounded,
+        icon: Symbols.category_rounded,
         label: 'Catégories',
         subtitle: 'Organisation',
         route: '/admin/categories',
@@ -56,7 +57,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.categoriesManage],
       ),
       const _AdminTileConfig(
-        icon: Icons.local_shipping_rounded,
+        icon: Symbols.local_shipping_rounded,
         label: 'Livraisons',
         subtitle: 'Expéditions',
         route: '/admin/deliveries',
@@ -64,7 +65,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.deliveriesView],
       ),
       const _AdminTileConfig(
-        icon: Icons.two_wheeler_rounded,
+        icon: Symbols.two_wheeler_rounded,
         label: 'Livreurs',
         subtitle: 'Flotte & Effectifs',
         route: '/admin/drivers',
@@ -72,7 +73,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.driversManage],
       ),
       const _AdminTileConfig(
-        icon: Icons.people_alt_rounded,
+        icon: Symbols.people_alt_rounded,
         label: 'Employés',
         subtitle: 'Rôles & Accès',
         route: '/admin/employees',
@@ -80,7 +81,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.employeesManage, AdminPermissions.rolesManage],
       ),
       const _AdminTileConfig(
-        icon: Icons.local_offer_rounded,
+        icon: Symbols.local_offer_rounded,
         label: 'Promotions',
         subtitle: 'Offres & Remises',
         route: '/admin/promotions',
@@ -88,7 +89,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.promotionsView],
       ),
       const _AdminTileConfig(
-        icon: Icons.account_balance_wallet_rounded,
+        icon: Symbols.account_balance_wallet_rounded,
         label: 'Paiements',
         subtitle: 'Transactions',
         route: '/admin/payments',
@@ -96,7 +97,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         requiredPermissions: [AdminPermissions.paymentsView],
       ),
       const _AdminTileConfig(
-        icon: Icons.history_toggle_off_rounded,
+        icon: Symbols.history_toggle_off_rounded,
         label: "Journal",
         subtitle: "Historique d'activité",
         route: '/admin/activity-logs',
@@ -162,7 +163,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.logout_rounded, color: Color(0xFF64748B), size: 22),
+                      icon: const Icon(Symbols.logout_rounded, color: Color(0xFF64748B), size: 22),
                       tooltip: 'Se déconnecter',
                       onPressed: () async {
                         await ref.read(authNotifierProvider.notifier).logout();
@@ -184,7 +185,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   decoration: InputDecoration(
                     hintText: 'Rechercher un module...',
                     hintStyle: TextStyle(fontSize: 14, color: Colors.grey.shade400),
-                    prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
+                    prefixIcon: const Icon(Symbols.search_rounded, color: Color(0xFF94A3B8)),
                     filled: true,
                     fillColor: const Color(0xFFF1F5F9),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -207,11 +208,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     children: const [
-                      _StatCard(title: 'Commandes du jour', value: '128', icon: Icons.shopping_bag_outlined, color: Color(0xFFFF6600)),
+                      _StatCard(title: 'Commandes du jour', value: '128', icon: Symbols.shopping_bag, color: Color(0xFFFF6600)),
                       SizedBox(width: 10),
-                      _StatCard(title: 'Livrées aujourd\'hui', value: '94', icon: Icons.local_shipping_outlined, color: Color(0xFF2E7D32)),
+                      _StatCard(title: 'Livrées aujourd\'hui', value: '94', icon: Symbols.local_shipping, color: Color(0xFF2E7D32)),
                       SizedBox(width: 10),
-                      _StatCard(title: 'Stock Faible', value: '5', icon: Icons.warning_amber_rounded, color: Color(0xFFE53935)),
+                      _StatCard(title: 'Stock Faible', value: '5', icon: Symbols.warning_amber_rounded, color: Color(0xFFE53935)),
                     ],
                   ),
                 ),

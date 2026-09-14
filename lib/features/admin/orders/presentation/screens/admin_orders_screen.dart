@@ -13,6 +13,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
 import '../../../../orders/presentation/widgets/order_status_badge.dart';
 import '../providers/admin_orders_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminOrdersScreen extends ConsumerStatefulWidget {
   const AdminOrdersScreen({super.key});
@@ -91,11 +92,11 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'Rechercher un numéro de commande…',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Symbols.search),
                 suffixIcon: _searchController.text.isEmpty
                     ? null
                     : IconButton(
-                        icon: const Icon(Icons.close),
+                        icon: const Icon(Symbols.close),
                         onPressed: () {
                           _searchController.clear();
                           ref.read(adminOrderListProvider.notifier).search(null);
@@ -144,7 +145,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
                         onRetry: () => ref.read(adminOrderListProvider.notifier).loadFirstPage(),
                       )
                     : state.orders.isEmpty
-                        ? const EmptyState(icon: Icons.receipt_long_outlined, title: 'Aucune commande')
+                        ? const EmptyState(icon: Symbols.receipt_long, title: 'Aucune commande')
                         : ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(16),

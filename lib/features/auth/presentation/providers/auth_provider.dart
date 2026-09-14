@@ -36,10 +36,18 @@ class AuthState {
 
   factory AuthState.initial() => AuthState(status: AuthStatus.initial);
 
-  AuthState copyWith({AuthStatus? status, UserModel? user, String? errorMessage}) {
+  // `clearUser: true` force le passage à null : avec `user ?? this.user`,
+  // il était impossible de remettre `user` à null (ex: forceLogout), ce qui
+  // laissait l'ancien utilisateur "fantôme" en mémoire après déconnexion.
+  AuthState copyWith({
+    AuthStatus? status,
+    UserModel? user,
+    bool clearUser = false,
+    String? errorMessage,
+  }) {
     return AuthState(
       status: status ?? this.status,
-      user: user ?? this.user,
+      user: clearUser ? null : (user ?? this.user),
       errorMessage: errorMessage,
     );
   }
@@ -120,7 +128,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> forceLogout() async {
     await SecureStorage.deleteToken();
-    state = state.copyWith(status: AuthStatus.unauthenticated, user: null);
+    state = state.copyWith(status: AuthStatus.unauthenticated, clearUser: true);
   }
 
   void clearError() {

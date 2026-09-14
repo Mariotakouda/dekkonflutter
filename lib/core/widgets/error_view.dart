@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'custom_button.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ErrorView extends StatelessWidget {
   final String message;
@@ -25,7 +26,7 @@ class ErrorView extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.error_outline_rounded,
+                Symbols.error_rounded,
                 size: 40,
                 color: AppColors.error,
               ),

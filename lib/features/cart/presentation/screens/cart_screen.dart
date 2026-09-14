@@ -6,12 +6,14 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/dekkon_bottom_nav.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/dekkon_logo.dart';
+import '../../../../core/widgets/gradient_header.dart';
 import '../../data/models/cart_model.dart';
 import '../providers/cart_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -26,9 +28,9 @@ class CartScreen extends ConsumerWidget {
         child: Column(
           children: [
             cartState.when(
-              loading: () => const _CartHeader(title: 'Dekkon'),
+              loading: () => const _CartHeader(showLogo: true),
               error: (_, _) => const _CartHeader(title: 'Mon panier'),
-              data: (cart) => _CartHeader(title: (cart == null || cart.isEmpty) ? 'Mon panier' : 'Dekkon'),
+              data: (cart) => _CartHeader(showLogo: !(cart == null || cart.isEmpty)),
             ),
             Expanded(
               child: cartState.when(
@@ -40,7 +42,7 @@ class CartScreen extends ConsumerWidget {
                 data: (cart) {
                   if (cart == null || cart.isEmpty) {
                     return EmptyState(
-                      icon: Icons.shopping_bag_outlined,
+                      icon: Symbols.shopping_bag,
                       title: 'Votre panier est vide',
                       subtitle: 'Parcourez nos catégories et trouvez les articles qui vous plaisent.',
                       action: ElevatedButton(
@@ -63,7 +65,7 @@ class CartScreen extends ConsumerWidget {
                           color: AppColors.errorContainer,
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, size: 16, color: AppColors.error),
+                              const Icon(Symbols.error, size: 16, color: AppColors.error),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -91,52 +93,56 @@ class CartScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const DekkonBottomNav(currentIndex: 2),
     );
   }
 }
 
 /// TopAppBar conforme aux maquettes Stitch "panier_dekkon" / "panier_vide_dekkon" :
-/// icône menu à gauche, titre centré ("Dekkon" si le panier contient des
+/// icône menu à gauche, titre centré (logo Dekkon si le panier contient des
 /// articles, "Mon panier" s'il est vide), icône recherche à droite.
+/// Fond : dégradé orange -> blanc commun à toutes les pages principales.
 class _CartHeader extends StatelessWidget {
+  final bool showLogo;
   final String title;
 
-  const _CartHeader({required this.title});
+  const _CartHeader({this.showLogo = false, this.title = 'Mon panier'});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.textSecondary),
-            onPressed: () => Scaffold.maybeOf(context)?.openDrawer(),
-          ),
-          Expanded(
-            child: Center(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.secondary, // token "primary" (#00236F) du design system
+    return GradientHeader(
+      child: SizedBox(
+        height: 56,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Symbols.menu, color: Colors.white),
+                onPressed: () => Scaffold.maybeOf(context)?.openDrawer(),
+              ),
+              Expanded(
+                child: Center(
+                  child: showLogo
+                      ? const DekkonLogo(height: 24)
+                      : Text(
+                          title,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
-            ),
+              IconButton(
+                icon: const Icon(Symbols.search, color: Colors.white),
+                // go() et non push() : '/products' est un onglet de la coquille.
+                onPressed: () => context.go('/products'),
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.search, color: AppColors.textSecondary),
-            onPressed: () => context.push('/products'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -168,7 +174,7 @@ class _CartItemTile extends ConsumerWidget {
               color: AppColors.surfaceContainerLow,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.shopping_bag_outlined, color: AppColors.primaryDark),
+            child: const Icon(Symbols.shopping_bag, color: AppColors.primaryDark),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -194,7 +200,7 @@ class _CartItemTile extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               IconButton(
-                icon: const Icon(Icons.delete_outline, size: 20, color: AppColors.error),
+                icon: const Icon(Symbols.delete, size: 20, color: AppColors.error),
                 onPressed: () => notifier.removeItem(item.id),
                 constraints: const BoxConstraints(),
                 padding: EdgeInsets.zero,
@@ -210,7 +216,7 @@ class _CartItemTile extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _QtyBtn(
-                      icon: Icons.remove,
+                      icon: Symbols.remove,
                       onTap: item.quantity > 1
                           ? () => notifier.updateItem(itemId: item.id, quantity: item.quantity - 1)
                           : null,
@@ -220,7 +226,7 @@ class _CartItemTile extends ConsumerWidget {
                       child: Text('${item.quantity}', textAlign: TextAlign.center, style: AppTextStyles.labelMedium),
                     ),
                     _QtyBtn(
-                      icon: Icons.add,
+                      icon: Symbols.add,
                       onTap: () => notifier.updateItem(itemId: item.id, quantity: item.quantity + 1),
                     ),
                   ],
@@ -312,7 +318,7 @@ class _CartSummary extends StatelessWidget {
                 children: [
                   Text('Passer la commande'),
                   SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, size: 18),
+                  Icon(Symbols.arrow_forward, size: 18),
                 ],
               ),
             ),

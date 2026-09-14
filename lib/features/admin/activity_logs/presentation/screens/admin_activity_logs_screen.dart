@@ -9,6 +9,7 @@ import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
 import '../../data/repositories/admin_activity_logs_repository.dart';
 import '../providers/admin_activity_logs_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminActivityLogsScreen extends ConsumerStatefulWidget {
   const AdminActivityLogsScreen({super.key});
@@ -106,7 +107,7 @@ class _AdminActivityLogsScreenState
 
                 if (filteredLogs.isEmpty) {
                   return const EmptyState(
-                    icon: Icons.history,
+                    icon: Symbols.history,
                     title: 'Aucune activité enregistrée',
                   );
                 }
@@ -133,18 +134,18 @@ class _LogTile extends StatelessWidget {
   const _LogTile({required this.log});
 
   IconData get _icon {
-    if (log.action.startsWith('order.')) return Icons.receipt_long_outlined;
-    if (log.action.startsWith('product.')) return Icons.inventory_2_outlined;
-    if (log.action.startsWith('payment.')) return Icons.payments_outlined;
-    if (log.action.startsWith('category.')) return Icons.folder_outlined;
+    if (log.action.startsWith('order.')) return Symbols.receipt_long;
+    if (log.action.startsWith('product.')) return Symbols.inventory_2;
+    if (log.action.startsWith('payment.')) return Symbols.payments;
+    if (log.action.startsWith('category.')) return Symbols.folder;
     if (log.action.startsWith('employee.') || log.action.startsWith('role.')) {
-      return Icons.people_outline;
+      return Symbols.people;
     }
-    if (log.action.startsWith('promotion.')) return Icons.local_offer_outlined;
+    if (log.action.startsWith('promotion.')) return Symbols.local_offer;
     if (log.action.startsWith('driver.') || log.action.startsWith('delivery.')) {
-      return Icons.local_shipping_outlined;
+      return Symbols.local_shipping;
     }
-    return Icons.history;
+    return Symbols.history;
   }
 
   Color get _color {

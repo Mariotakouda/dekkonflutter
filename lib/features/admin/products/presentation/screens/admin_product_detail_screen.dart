@@ -12,6 +12,7 @@ import '../providers/admin_products_provider.dart';
 import 'admin_product_edit_screen.dart';
 import 'admin_product_images_screen.dart';
 import 'admin_product_variants_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminProductDetailScreen extends ConsumerWidget {
   final String productId;
@@ -56,12 +57,12 @@ class AdminProductDetailScreen extends ConsumerWidget {
         title: const Text('Détail produit'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined),
+            icon: const Icon(Symbols.edit),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => AdminProductEditScreen(productId: productId)),
             ),
           ),
-          IconButton(icon: const Icon(Icons.delete_outline), onPressed: () => _delete(context, ref)),
+          IconButton(icon: const Icon(Symbols.delete), onPressed: () => _delete(context, ref)),
         ],
       ),
       body: productAsync.when(
@@ -86,7 +87,7 @@ class AdminProductDetailScreen extends ConsumerWidget {
                 Container(
                   height: 140,
                   decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(12)),
-                  child: const Center(child: Icon(Icons.image_outlined, size: 40, color: AppColors.textDisabled)),
+                  child: const Center(child: Icon(Symbols.image, size: 40, color: AppColors.textDisabled)),
                 ),
               const SizedBox(height: 16),
               Text(product.name, style: AppTextStyles.h4),
@@ -99,7 +100,7 @@ class AdminProductDetailScreen extends ConsumerWidget {
               ],
               const SizedBox(height: 24),
               _ActionTile(
-                icon: Icons.photo_library_outlined,
+                icon: Symbols.photo_library,
                 label: 'Gérer les images (${product.images.length})',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => AdminProductImagesScreen(productId: productId)),
@@ -107,7 +108,7 @@ class AdminProductDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 10),
               _ActionTile(
-                icon: Icons.style_outlined,
+                icon: Symbols.style,
                 label: 'Gérer les variantes (${product.variants.length})',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => AdminProductVariantsScreen(productId: productId)),
@@ -145,7 +146,7 @@ class _ActionTile extends StatelessWidget {
             Icon(icon, color: AppColors.primary),
             const SizedBox(width: 12),
             Expanded(child: Text(label, style: AppTextStyles.bodyMedium)),
-            const Icon(Icons.chevron_right, color: AppColors.textDisabled),
+            const Icon(Symbols.chevron_right, color: AppColors.textDisabled),
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/utils/validators.dart';
 import '../providers/admin_employees_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AdminEmployeeFormScreen extends ConsumerStatefulWidget {
   final String? employeeId;
@@ -139,7 +140,7 @@ class _AdminEmployeeFormScreenState extends ConsumerState<AdminEmployeeFormScree
         title: Text(_isEditing ? "Modifier l'employé" : 'Nouvel employé'),
         actions: [
           if (_isEditing)
-            IconButton(icon: const Icon(Icons.person_off_outlined), onPressed: _deactivate),
+            IconButton(icon: const Icon(Symbols.person_off), onPressed: _deactivate),
         ],
       ),
       body: (employeeAsync != null && employeeAsync.isLoading)

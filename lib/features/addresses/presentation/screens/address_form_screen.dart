@@ -8,6 +8,7 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/utils/validators.dart';
 import '../../data/models/addresses_model.dart';
 import '../providers/addresses_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AddressFormScreen extends ConsumerStatefulWidget {
   final AddressModel? existingAddress;
@@ -118,7 +119,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                     CustomTextField(
                       controller: _recipientController,
                       label: 'Nom du destinataire',
-                      prefixIcon: const Icon(Icons.person_outline, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.person, color: AppColors.outline),
                       validator: (v) => Validators.required(v, field: 'Le destinataire'),
                     ),
                     const SizedBox(height: 16),
@@ -126,7 +127,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                       controller: _phoneController,
                       label: 'Téléphone',
                       keyboardType: TextInputType.phone,
-                      prefixIcon: const Icon(Icons.call_outlined, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.call, color: AppColors.outline),
                       validator: Validators.phone,
                     ),
                     const SizedBox(height: 16),
@@ -154,7 +155,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                       controller: _addressLineController,
                       label: 'Adresse détaillée',
                       maxLines: 2,
-                      prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.location_on, color: AppColors.outline),
                       validator: (v) => Validators.required(v, field: "L'adresse"),
                     ),
                     const SizedBox(height: 16),
@@ -162,7 +163,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                       controller: _landmarkController,
                       label: 'Point de repère (optionnel)',
                       hint: "Ex : Près de l'école primaire",
-                      prefixIcon: const Icon(Icons.push_pin_outlined, color: AppColors.outline),
+                      prefixIcon: const Icon(Symbols.push_pin, color: AppColors.outline),
                     ),
                   ],
                 ),

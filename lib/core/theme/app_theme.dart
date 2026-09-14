@@ -75,7 +75,7 @@ class AppTheme {
         labelSmall: AppTextStyles.labelSmall,
       ),
 
-      // Bouton primaire — CTA ambre "Acheter" / "Ajouter au panier"
+      // Bouton primaire — CTA orange "Acheter" / "Ajouter au panier"
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -88,7 +88,7 @@ class AppTheme {
         ),
       ),
 
-      // Bouton secondaire — bleu confiance, actions de navigation
+      // Bouton secondaire — noir profond, actions de navigation
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.secondary,
@@ -116,7 +116,7 @@ class AppTheme {
         ),
       ),
 
-      // Champs de saisie — rayon 16px, focus en bleu confiance
+      // Champs de saisie — rayon 8px, focus en noir profond
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,

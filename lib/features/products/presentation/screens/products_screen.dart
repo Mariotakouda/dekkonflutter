@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/dekkon_bottom_nav.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/simple_filter_chip.dart';
 import '../../../categories/presentation/providers/categories_provider.dart';
 import '../providers/products_provider.dart';
 import '../widgets/product_grid.dart';
@@ -19,7 +19,7 @@ class ProductsScreen extends ConsumerStatefulWidget {
     super.key,
     this.productId,
     this.initialCategoryId,
-    this.initialFeaturedOnly = false,
+    this.initialFeaturedOnly = false, String? initialSearch,
   });
 
   @override
@@ -183,7 +183,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  _FilterChip(
+                  SimpleFilterChip(
                     label: 'Tous',
                     selected: _selectedCategoryId == null,
                     onTap: () {
@@ -194,7 +194,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   const SizedBox(width: 8),
                   ...categories.map((c) => Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: _FilterChip(
+                        child: SimpleFilterChip(
                           label: c.name,
                           selected: _selectedCategoryId == c.id,
                           onTap: () {
@@ -231,33 +231,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             ),
         ],
       ),
-      bottomNavigationBar: const DekkonBottomNav(currentIndex: 1),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _FilterChip({required this.label, required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => onTap(),
-      backgroundColor: AppColors.surfaceContainerHigh,
-      selectedColor: AppColors.primaryDark, // token "primary-container" du design system
-      shape: const StadiumBorder(),
-      labelStyle: TextStyle(
-        color: selected ? Colors.white : AppColors.textSecondary,
-        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-      ),
-      side: selected ? BorderSide.none : const BorderSide(color: AppColors.border),
-      showCheckmark: false,
     );
   }
 }

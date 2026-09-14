@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/dekkon_bottom_nav.dart';
+import '../../../../core/widgets/dekkon_logo.dart';
+import '../../../../core/widgets/gradient_header.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/screens/verify_account_screen.dart';
 import '../../../notifications/presentation/providers/notifications_provider.dart';
 import 'edit_profile_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -26,50 +28,48 @@ class ProfileScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // TopAppBar conforme à "profil_dekkon" : titre "Dekkon" centré + icône notifications.
-            Container(
-              height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 48), // équilibre visuel avec l'icône de droite
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        'Dekkon',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Stack(
-                    clipBehavior: Clip.none,
+            // TopAppBar conforme à "profil_dekkon" : logo centré + icône
+            // notifications, sur le dégradé orange -> blanc commun à toutes
+            // les pages principales.
+            GradientHeader(
+              child: SizedBox(
+                height: 56,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined, color: AppColors.textSecondary),
-                        onPressed: () => context.push('/notifications'),
-                      ),
-                      if (unreadCount > 0)
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
-                          ),
+                      const SizedBox(width: 48), // équilibre visuel avec l'icône de droite
+                      const Expanded(
+                        child: Center(
+                          child: DekkonLogo(height: 24),
                         ),
+                      ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Symbols.notifications, color: Colors.white),
+                            onPressed: () => context.push('/notifications'),
+                          ),
+                          if (unreadCount > 0)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.error,
+                                  shape: BoxShape.circle,
+                                  border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 1.5)),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
 
@@ -111,7 +111,7 @@ class ProfileScreen extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(color: AppColors.surface, width: 2),
                                 ),
-                                child: const Icon(Icons.verified, size: 13, color: Colors.white),
+                                child: const Icon(Symbols.verified, size: 13, color: Colors.white),
                               ),
                             ),
                           ],
@@ -149,7 +149,7 @@ class ProfileScreen extends ConsumerWidget {
 
                   _MenuSection(children: [
                     _MenuTile(
-                      icon: Icons.person_outline,
+                      icon: Symbols.person,
                       label: 'Mon profil',
                       subtitle: 'Gérez vos infos',
                       onTap: () => Navigator.of(context).push(
@@ -157,27 +157,30 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                     _MenuTile(
-                      icon: Icons.location_on_outlined,
+                      icon: Symbols.location_on,
                       label: 'Mes adresses',
                       onTap: () => context.push('/addresses'),
                     ),
                     _MenuTile(
-                      icon: Icons.receipt_long_outlined,
+                      icon: Symbols.receipt_long,
                       label: 'Mes commandes',
-                      onTap: () => context.push('/orders'),
+                      // go() et non push() : '/orders' est un onglet de la
+                      // coquille à navigation, pas un écran empilé (même
+                      // bug que /cart, voir product_detail_screen.dart).
+                      onTap: () => context.go('/orders'),
                     ),
                     _MenuTile(
-                      icon: Icons.favorite_border,
+                      icon: Symbols.favorite,
                       label: 'Mes favoris',
                       onTap: () => context.push('/favorites'),
                     ),
                     _MenuTile(
-                      icon: Icons.star_border,
+                      icon: Symbols.star,
                       label: 'Mes avis',
                       onTap: () => context.push('/reviews'),
                     ),
                     _MenuTile(
-                      icon: Icons.notifications_outlined,
+                      icon: Symbols.notifications,
                       label: 'Notifications',
                       trailingBadgeCount: unreadCount,
                       onTap: () => context.push('/notifications'),
@@ -188,7 +191,7 @@ class ProfileScreen extends ConsumerWidget {
 
                   _MenuSection(children: [
                     _MenuTile(
-                      icon: Icons.verified_user_outlined,
+                      icon: Symbols.verified_user,
                       label: 'Vérifier mon compte',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const VerifyAccountScreen()),
@@ -200,18 +203,28 @@ class ProfileScreen extends ConsumerWidget {
 
                   _MenuSection(children: [
                     _MenuTile(
-                      icon: Icons.logout,
+                      icon: Symbols.logout,
                       label: 'Se déconnecter',
                       isDestructive: true,
                       isLast: true,
                       onTap: () async {
                         final confirmed = await showDialog<bool>(
                           context: context,
-                          builder: (_) => AlertDialog(
+                          // `dialogContext` (et non le `context` de la page Profil) :
+                          // sinon Navigator.pop dépile la page Profil elle-même dans
+                          // go_router au lieu de fermer juste la popup, ce qui peut
+                          // vider toute la pile de navigation (écran blanc).
+                          builder: (dialogContext) => AlertDialog(
                             title: const Text('Se déconnecter ?'),
                             actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
-                              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Déconnexion')),
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext, false),
+                                child: const Text('Annuler'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext, true),
+                                child: const Text('Déconnexion'),
+                              ),
                             ],
                           ),
                         );
@@ -229,7 +242,6 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const DekkonBottomNav(currentIndex: 4),
     );
   }
 }
@@ -308,7 +320,7 @@ class _MenuTile extends StatelessWidget {
                         style: AppTextStyles.labelSmall.copyWith(color: Colors.white),
                       ),
                     ),
-                  const Icon(Icons.chevron_right, color: AppColors.textDisabled),
+                  const Icon(Symbols.chevron_right, color: AppColors.textDisabled),
                 ],
               ),
         onTap: onTap,

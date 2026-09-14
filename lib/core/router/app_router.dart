@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/secure_storage.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import 'scaffold_with_nav_bar.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/auth_screen.dart';
@@ -37,6 +38,18 @@ import '../../features/admin/employees/presentation/screens/admin_employees_scre
 import '../../features/admin/promotions/presentation/screens/admin_promotions_screen.dart';
 import '../../features/admin/activity_logs/presentation/screens/admin_activity_logs_screen.dart';
 import '../../features/admin/payments/presentation/screens/admin_payments_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+/// Arguments passés en `extra` vers la route `/auth`. `redirectTo` permet de
+/// revenir sur la page d'origine (ex: fiche produit) après une connexion ou
+/// une inscription déclenchée depuis une action qui exige un compte (ajout
+/// au panier, favoris...), au lieu d'atterrir systématiquement sur l'accueil.
+class AuthScreenArgs {
+  final bool startInLoginMode;
+  final String? redirectTo;
+
+  const AuthScreenArgs({this.startInLoginMode = true, this.redirectTo});
+}
 
 class AppRoutes {
   AppRoutes._();
@@ -89,8 +102,11 @@ const Set<String> _publicRoutePaths = {
   AppRoutes.productDetail,
 };
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) async {
@@ -126,32 +142,97 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.auth,
         builder: (context, state) {
-          // `extra` transporte le mode initial (connexion/inscription) choisi
-          // sur l'écran de bienvenue — true par défaut (connexion).
-          final startInLoginMode = state.extra is bool ? state.extra as bool : true;
-          return AuthScreen(startInLoginMode: startInLoginMode);
+          // `extra` transporte soit un simple bool (ancien usage : mode
+          // initial connexion/inscription), soit un AuthScreenArgs complet
+          // avec une éventuelle page de retour (`redirectTo`).
+          final extra = state.extra;
+          bool startInLoginMode = true;
+          String? redirectTo;
+          if (extra is AuthScreenArgs) {
+            startInLoginMode = extra.startInLoginMode;
+            redirectTo = extra.redirectTo;
+          } else if (extra is bool) {
+            startInLoginMode = extra;
+          }
+          return AuthScreen(startInLoginMode: startInLoginMode, redirectTo: redirectTo);
         },
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
+
+      // --- Coquille persistante des 5 onglets principaux ---
+      // Chaque branche garde sa propre pile de navigation et son état
+      // (scroll, filtres) même en changeant d'onglet : les écrans ne sont
+      // jamais reconstruits, contrairement à l'ancien système où chaque
+      // écran gérait sa propre bottomNavigationBar via context.go().
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ScaffoldWithNavBar(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.products,
+                builder: (context, state) {
+                  final categoryId = state.uri.queryParameters['category_id'];
+                  final featured = state.uri.queryParameters['featured'] == 'true';
+                  final search = state.uri.queryParameters['search'];
+                  return ProductsScreen(
+                    initialCategoryId: categoryId,
+                    initialFeaturedOnly: featured,
+                    initialSearch: search,
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.cart,
+                builder: (context, state) => const CartScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.orders,
+                builder: (context, state) => const OrdersScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
+
+      // --- Écrans secondaires (hors shell) ---
+      // Poussés en plein écran, par-dessus la coquille, sans bottom nav :
+      // détail, formulaires, tunnels de paiement... Volontaire (voir
+      // explication UX) — on ne laisse pas sortir facilement d'un tunnel
+      // comme le checkout, et un écran de détail n'est pas une "destination"
+      // au même titre qu'un onglet.
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.categories,
         builder: (context, state) => const CategoriesScreen(),
       ),
       GoRoute(
-        path: AppRoutes.products,
-        builder: (context, state) {
-          final categoryId = state.uri.queryParameters['category_id'];
-          final featured = state.uri.queryParameters['featured'] == 'true';
-          return ProductsScreen(
-            initialCategoryId: categoryId,
-            initialFeaturedOnly: featured,
-          );
-        },
-      ),
-      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.productDetail,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -159,22 +240,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.favorites,
         builder: (context, state) => const FavoritesScreen(),
       ),
       GoRoute(
-        path: AppRoutes.cart,
-        builder: (context, state) => const CartScreen(),
-      ),
-      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.checkout,
         builder: (context, state) => const CheckoutScreen(),
       ),
       GoRoute(
-        path: AppRoutes.orders,
-        builder: (context, state) => const OrdersScreen(),
-      ),
-      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.orderDetail,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -182,10 +258,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.payments,
         builder: (context, state) => const PaymentsScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.delivery,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -193,32 +271,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.notifications,
         builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.addresses,
         builder: (context, state) => const AddressesScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.reviews,
         builder: (context, state) => const ReviewsScreen(),
       ),
 
       // Admin
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminDashboard,
         builder: (context, state) => const AdminDashboardScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminOrders,
         builder: (context, state) => const AdminOrdersScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminOrderDetail,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -226,38 +306,47 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminInventory,
         builder: (context, state) => const AdminInventoryScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminProducts,
         builder: (context, state) => const AdminProductsListScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminCategories,
         builder: (context, state) => const AdminCategoriesScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminDeliveries,
         builder: (context, state) => const AdminDeliveriesScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminDrivers,
         builder: (context, state) => const AdminDriversScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminEmployees,
         builder: (context, state) => const AdminEmployeesScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminPromotions,
         builder: (context, state) => const AdminPromotionsScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminPayments,
         builder: (context, state) => const AdminPaymentsScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminActivityLogs,
         builder: (context, state) => const AdminActivityLogsScreen(),
       ),
@@ -345,7 +434,7 @@ class _SplashRedirectorState extends ConsumerState<_SplashRedirector>
                   errorBuilder: (context, error, stackTrace) => Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.storefront, size: 72, color: AppColors.primary),
+                      const Icon(Symbols.storefront, size: 72, color: AppColors.primary),
                       const SizedBox(height: 12),
                       Text('DEKKON', style: AppTextStyles.h1.copyWith(color: AppColors.primary)),
                     ],

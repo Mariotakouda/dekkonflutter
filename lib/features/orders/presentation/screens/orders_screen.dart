@@ -6,10 +6,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/dekkon_bottom_nav.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/simple_filter_chip.dart';
+import '../../../../core/widgets/gradient_header.dart';
 import '../providers/orders_provider.dart';
 import '../widgets/order_status_badge.dart';
 
@@ -46,72 +47,63 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // TopAppBar + filtres, conformes à "mes_commandes_dekkon".
+            // TopAppBar sur dégradé orange -> blanc commun à toutes les pages.
+            GradientHeader(
+              child: SizedBox(
+                height: 56,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Mes commandes',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.search, color: Colors.white),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.tune, color: Colors.white),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Bandeau des filtres de statut, resté blanc pour la lisibilité
+            // des chips (comme la barre de recherche sous le dégradé).
             Container(
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 border: const Border(bottom: BorderSide(color: AppColors.border)),
                 boxShadow: AppTheme.ambientShadow,
               ),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 56,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Mes commandes',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.secondary, // token "primary" du design system
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.search, color: AppColors.textSecondary),
-                            onPressed: () {},
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.tune, color: AppColors.textSecondary),
-                            onPressed: () {},
-                          ),
-                        ],
+              child: SizedBox(
+                height: 44,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  children: _statusFilters.entries.map((entry) {
+                    final selected = _selectedStatus == entry.key;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: SimpleFilterChip(
+                        label: entry.value,
+                        selected: selected,
+                        onTap: () => setState(() => _selectedStatus = entry.key),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 44,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      children: _statusFilters.entries.map((entry) {
-                        final selected = _selectedStatus == entry.key;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text(entry.value),
-                            selected: selected,
-                            onSelected: (_) => setState(() => _selectedStatus = entry.key),
-                            backgroundColor: AppColors.surfaceContainerHigh,
-                            selectedColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            labelStyle: TextStyle(
-                              color: selected ? Colors.white : AppColors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            side: selected ? BorderSide.none : const BorderSide(color: AppColors.border),
-                            showCheckmark: false,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+                    );
+                  }).toList(),
+                ),
               ),
             ),
 
@@ -130,10 +122,20 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                         : allOrders.where((o) => o.status == _selectedStatus).toList();
 
                     if (orders.isEmpty) {
-                      return const EmptyState(
-                        icon: Icons.receipt_long_outlined,
-                        title: 'Aucune commande',
-                        subtitle: 'Vos commandes passées apparaîtront ici.',
+                      // Enveloppé dans un ListView (et non un simple widget centré)
+                      // pour que le pull-to-refresh du RefreshIndicator reste
+                      // toujours utilisable, même quand ce filtre ne contient
+                      // aucune commande.
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: const [
+                          SizedBox(height: 80),
+                          EmptyState(
+                            icon: Icons.receipt_long_outlined,
+                            title: 'Aucune commande',
+                            subtitle: 'Vos commandes passées apparaîtront ici.',
+                          ),
+                        ],
                       );
                     }
 
@@ -150,7 +152,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const DekkonBottomNav(currentIndex: 3),
     );
   }
 }
@@ -162,7 +163,38 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = order.items as List;
+    // Filet de sécurité : si une commande a une donnée inattendue (ex. un
+    // champ manquant sur une ancienne commande), on affiche une carte
+    // dégradée minimale au lieu de faire planter TOUTE la liste (une seule
+    // carte défaillante peut, dans un ListView, invalider la mise en page de
+    // toute la liste — d'où la page qui semblait totalement vide).
+    try {
+      return _buildCard(context);
+    } catch (_) {
+      return Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text("Impossible d'afficher cette commande.", style: AppTextStyles.caption),
+            ),
+            TextButton(
+              onPressed: () => context.push('/orders/${order.id}'),
+              child: const Text('Voir'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildCard(BuildContext context) {
+    final items = (order.items as List?) ?? const [];
 
     return InkWell(
       onTap: () => context.push('/orders/${order.id}'),
@@ -181,13 +213,16 @@ class _OrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('#${order.orderNumber}', style: AppTextStyles.labelLarge),
-                    Text(Formatters.dateTime(order.placedAt), style: AppTextStyles.caption),
-                  ],
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('#${order.orderNumber}', style: AppTextStyles.labelLarge, overflow: TextOverflow.ellipsis),
+                      Text(Formatters.dateTime(order.placedAt), style: AppTextStyles.caption),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 OrderStatusBadge(status: order.status),
               ],
             ),
@@ -195,6 +230,7 @@ class _OrderCard extends StatelessWidget {
             Row(
               children: [
                 SizedBox(
+                  width: items.length > 2 ? 100 : (44.0 * items.length + 6 * (items.length - 1).clamp(0, 999)),
                   height: 44,
                   child: Row(
                     children: List.generate(items.length > 2 ? 2 : items.length, (i) {
@@ -213,9 +249,12 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ),
                 if (items.isNotEmpty)
-                  Text(
-                    items.length > 2 ? '+${items.length - 2} articles' : '${items.length} article${items.length > 1 ? 's' : ''}',
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                  Flexible(
+                    child: Text(
+                      items.length > 2 ? '+${items.length - 2} articles' : '${items.length} article${items.length > 1 ? 's' : ''}',
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
               ],
             ),

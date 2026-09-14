@@ -7,16 +7,19 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/dekkon_logo.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/router/app_router.dart';
 import '../providers/auth_provider.dart';
 import 'auth_success_screen.dart';
 import 'forgot_password_screen.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   final bool startInLoginMode;
+  final String? redirectTo;
 
-  const AuthScreen({super.key, this.startInLoginMode = true});
+  const AuthScreen({super.key, this.startInLoginMode = true, this.redirectTo});
 
   @override
   ConsumerState<AuthScreen> createState() => _AuthScreenState();
@@ -74,16 +77,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final state = ref.read(authNotifierProvider);
 
     if (state.isAuthenticated) {
+      final isEmployee = state.user?.isEmployee ?? false;
+      final hasRedirect = widget.redirectTo != null && widget.redirectTo!.isNotEmpty;
+
       if (!_isLoginMode) {
         // Inscription réussie : passe par l'écran de succès dédié
-        // ("succès_authentification_dekkon") avant l'accueil.
+        // ("succès_authentification_dekkon") avant l'accueil — ou la page
+        // d'origine si l'inscription a été déclenchée depuis une action qui
+        // exigeait un compte (ajout au panier, favoris...).
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AuthSuccessScreen()),
+          MaterialPageRoute(builder: (_) => AuthSuccessScreen(redirectTo: widget.redirectTo)),
         );
         return;
       }
-      final isEmployee = state.user?.isEmployee ?? false;
-      context.go(isEmployee ? AppRoutes.adminDashboard : AppRoutes.home);
+      // Un employé garde toujours priorité sur son dashboard (peu probable
+      // qu'un redirectTo existe pour un employé, mais on reste explicite).
+      if (hasRedirect && !isEmployee) {
+        context.go(widget.redirectTo!);
+      } else {
+        context.go(isEmployee ? AppRoutes.adminDashboard : AppRoutes.home);
+      }
     } else if (state.status == AuthStatus.error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(state.errorMessage ?? 'Une erreur est survenue.')),
@@ -111,7 +124,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                      icon: const Icon(Symbols.arrow_back, color: AppColors.textPrimary),
                       onPressed: () {
                         if (Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();
@@ -137,13 +150,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           // En-tête / logo
                           Column(
                             children: [
-                              Icon(Icons.shopping_bag_rounded,
-                                  size: 40, color: AppColors.primary),
-                              const SizedBox(height: 8),
-                              Text('Dekkon',
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.h1Mobile
-                                      .copyWith(color: AppColors.primary)),
+                              const DekkonLogo(height: 56),
                               const SizedBox(height: 16),
                               if (_isLoginMode) ...[
                                 Text(
@@ -170,7 +177,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               controller: _firstNameController,
                               label: 'Prénom',
                               hint: 'Ex : Koffi',
-                              prefixIcon: const Icon(Icons.person_outline,
+                              prefixIcon: const Icon(Symbols.person,
                                   color: AppColors.outline),
                               validator: (v) =>
                                   Validators.required(v, field: 'Le prénom'),
@@ -180,7 +187,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               controller: _lastNameController,
                               label: 'Nom',
                               hint: 'Ex : Mensah',
-                              prefixIcon: const Icon(Icons.person_outline,
+                              prefixIcon: const Icon(Symbols.person,
                                   color: AppColors.outline),
                               validator: (v) =>
                                   Validators.required(v, field: 'Le nom'),
@@ -191,7 +198,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               label: 'Téléphone',
                               hint: '+228XXXXXXXX',
                               keyboardType: TextInputType.phone,
-                              prefixIcon: const Icon(Icons.call_outlined,
+                              prefixIcon: const Icon(Symbols.call,
                                   color: AppColors.outline),
                               validator: Validators.phone,
                             ),
@@ -204,7 +211,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             hint: _isLoginMode ? 'nom@exemple.com' : 'jean.dupont@exemple.fr',
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: const Icon(
-                              Icons.mail_outline,
+                              Symbols.mail,
                               color: AppColors.outline,
                             ),
                             validator: Validators.email,
@@ -217,14 +224,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             hint: '••••••••',
                             obscureText: _obscurePassword,
                             prefixIcon: Icon(
-                              Icons.lock_outline,
+                              Symbols.lock,
                               color: hasError ? AppColors.error : AppColors.outline,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
+                                    ? Symbols.visibility_off
+                                    : Symbols.visibility,
                                 color: AppColors.textSecondary,
                               ),
                               onPressed: () => setState(
@@ -237,7 +244,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(Icons.error_outline,
+                                const Icon(Symbols.error,
                                     size: 14, color: AppColors.error),
                                 const SizedBox(width: 4),
                                 Expanded(
@@ -259,13 +266,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               label: 'Confirmer le mot de passe',
                               hint: '••••••••',
                               obscureText: _obscureConfirmPassword,
-                              prefixIcon: const Icon(Icons.lock_outline,
+                              prefixIcon: const Icon(Symbols.lock,
                                   color: AppColors.outline),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscureConfirmPassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
+                                      ? Symbols.visibility_off
+                                      : Symbols.visibility,
                                   color: AppColors.textSecondary,
                                 ),
                                 onPressed: () => setState(() =>

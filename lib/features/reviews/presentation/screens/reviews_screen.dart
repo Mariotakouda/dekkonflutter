@@ -7,6 +7,7 @@ import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../providers/reviews_provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ReviewsScreen extends ConsumerWidget {
   const ReviewsScreen({super.key});
@@ -23,7 +24,7 @@ class ReviewsScreen extends ConsumerWidget {
         data: (reviews) {
           if (reviews.isEmpty) {
             return const EmptyState(
-              icon: Icons.star_border,
+              icon: Symbols.star,
               title: 'Aucun avis publié',
               subtitle: 'Donnez votre avis après réception d\'une commande.',
             );
@@ -50,7 +51,8 @@ class ReviewsScreen extends ConsumerWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: List.generate(5, (i) => Icon(
-                            i < review.rating ? Icons.star : Icons.star_border,
+                            Symbols.star,
+                            fill: i < review.rating ? 1 : 0,
                             size: 18,
                             color: AppColors.secondary,
                           )),

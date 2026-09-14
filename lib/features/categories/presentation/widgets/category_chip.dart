@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../data/models/categories_model.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class CategoryChip extends StatelessWidget {
   final CategoryModel category;
@@ -12,24 +13,68 @@ class CategoryChip extends StatelessWidget {
 
   /// Choisit une icône représentative selon le nom de la catégorie —
   /// purement visuel, n'a aucun impact sur les données/la navigation.
+  String get _normalizedName {
+    var n = category.name.toLowerCase();
+    const accents = {
+      'à': 'a', 'â': 'a', 'ä': 'a',
+      'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+      'î': 'i', 'ï': 'i',
+      'ô': 'o', 'ö': 'o',
+      'ù': 'u', 'û': 'u', 'ü': 'u',
+      'ç': 'c',
+    };
+    accents.forEach((accented, plain) => n = n.replaceAll(accented, plain));
+    return n;
+  }
+
   IconData get _fallbackIcon {
-    final name = category.name.toLowerCase();
-    if (name.contains('tél') || name.contains('tel') || name.contains('tablet') || name.contains('phone')) {
-      return Icons.phone_iphone_outlined;
+    final name = _normalizedName;
+    if (name.contains('electron') || name.contains('high-tech') || name.contains('hightech')) {
+      return Symbols.devices;
     }
-    if (name.contains('mode') || name.contains('vêt') || name.contains('vet')) {
-      return Icons.checkroom_outlined;
+    if (name.contains('vehicul') || name.contains('auto') || name.contains('voiture') || name.contains('moto')) {
+      return Symbols.directions_car;
     }
-    if (name.contains('info') || name.contains('ordinateur') || name.contains('pc')) {
-      return Icons.laptop_mac_outlined;
+    if (name.contains('tel') || name.contains('tablet') || name.contains('phone') || name.contains('smartphone')) {
+      return Symbols.phone_iphone;
     }
-    if (name.contains('maison') || name.contains('jardin')) {
-      return Icons.thermostat_outlined;
+    if (name.contains('mode') || name.contains('vet') || name.contains('vestimentaire')) {
+      return Symbols.checkroom;
     }
-    if (name.contains('jeu') || name.contains('gaming')) {
-      return Icons.sports_esports_outlined;
+    if (name.contains('chaussure') || name.contains('sneaker')) {
+      return Symbols.footprint;
     }
-    return Icons.category_outlined;
+    if (name.contains('info') || name.contains('ordinateur') || name.contains('pc') || name.contains('laptop')) {
+      return Symbols.laptop_mac;
+    }
+    if (name.contains('maison') || name.contains('jardin') || name.contains('deco') || name.contains('meuble')) {
+      return Symbols.chair;
+    }
+    if (name.contains('jeu') || name.contains('gaming') || name.contains('console')) {
+      return Symbols.sports_esports;
+    }
+    if (name.contains('sport') || name.contains('fitness') || name.contains('muscu')) {
+      return Symbols.fitness_center;
+    }
+    if (name.contains('beaute') || name.contains('cosmet') || name.contains('parfum') || name.contains('soin')) {
+      return Symbols.spa;
+    }
+    if (name.contains('aliment') || name.contains('epicerie') || name.contains('nourriture') || name.contains('boisson')) {
+      return Symbols.restaurant;
+    }
+    if (name.contains('bijou') || name.contains('montre') || name.contains('accessoire')) {
+      return Symbols.diamond;
+    }
+    if (name.contains('livre') || name.contains('papeterie') || name.contains('bureau')) {
+      return Symbols.menu_book;
+    }
+    if (name.contains('bebe') || name.contains('enfant') || name.contains('jouet')) {
+      return Symbols.child_care;
+    }
+    if (name.contains('animal') || name.contains('animalerie')) {
+      return Symbols.pets;
+    }
+    return Symbols.category;
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -34,7 +35,7 @@ class SectionHeader extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const Icon(Icons.chevron_right, size: 18, color: AppColors.primaryDark),
+                  const Icon(Symbols.chevron_right, size: 18, color: AppColors.primaryDark),
                 ],
               ),
             ),
