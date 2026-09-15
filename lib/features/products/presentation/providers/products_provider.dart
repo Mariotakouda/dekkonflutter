@@ -80,6 +80,18 @@ class ProductListState {
   }
 }
 
+/// Sentinel utilisé par [ProductListNotifier.updateFilters] pour distinguer
+/// "paramètre non fourni" de "paramètre explicitement remis à null".
+/// Avant ce correctif, `categoryId: null` (ex: bouton "Tous") était perdu
+/// car `copyWith` faisait `categoryId ?? this.categoryId`, qui retombe sur
+/// l'ancienne valeur dès que `null` est passé — impossible de réinitialiser
+/// le filtre catégorie une fois qu'il avait été positionné une fois.
+class _Unset {
+  const _Unset();
+}
+
+const _unset = _Unset();
+
 class ProductListNotifier extends Notifier<ProductListState> {
   ProductListParams _params = const ProductListParams();
 
@@ -138,8 +150,19 @@ class ProductListNotifier extends Notifier<ProductListState> {
     }
   }
 
-  void updateFilters({String? search, String? categoryId, String? sort}) {
-    _params = _params.copyWith(search: search, categoryId: categoryId, sort: sort);
+  /// Met à jour un ou plusieurs filtres. Utilise un sentinel (`_unset`) pour
+  /// que passer explicitement `null` (ex: catégorie "Tous") efface bien le
+  /// filtre au lieu de le laisser inchangé.
+  void updateFilters({
+    Object? search = _unset,
+    Object? categoryId = _unset,
+    Object? sort = _unset,
+  }) {
+    _params = ProductListParams(
+      search: identical(search, _unset) ? _params.search : search as String?,
+      categoryId: identical(categoryId, _unset) ? _params.categoryId : categoryId as String?,
+      sort: identical(sort, _unset) ? _params.sort : (sort as String? ?? _params.sort),
+    );
     loadFirstPage();
   }
 }

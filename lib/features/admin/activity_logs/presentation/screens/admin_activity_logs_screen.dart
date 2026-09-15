@@ -7,6 +7,7 @@ import '../../../../../core/utils/formatters.dart';
 import '../../../../../core/widgets/loading_indicator.dart';
 import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
+import '../../../../../core/widgets/simple_filter_chip.dart';
 import '../../data/repositories/admin_activity_logs_repository.dart';
 import '../providers/admin_activity_logs_provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -68,25 +69,13 @@ class _AdminActivityLogsScreenState
               itemBuilder: (context, index) {
                 final entityType = _entityTypes[index];
                 final selected = _selectedEntityType == entityType;
-                return ChoiceChip(
-                  label: Text(
-                    entityType == null
-                        ? 'Toutes'
-                        : (_entityTypeLabels[entityType] ?? entityType),
-                  ),
+                return SimpleFilterChip(
+                  label: entityType == null
+                      ? 'Toutes'
+                      : (_entityTypeLabels[entityType] ?? entityType),
                   selected: selected,
-                  onSelected: (_) =>
+                  onTap: () =>
                       setState(() => _selectedEntityType = entityType),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.12),
-                  labelStyle: TextStyle(
-                    color: selected
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                  side: BorderSide(
-                    color: selected ? AppColors.primary : AppColors.border,
-                  ),
                 );
               },
             ),

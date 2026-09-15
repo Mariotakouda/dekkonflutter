@@ -27,9 +27,7 @@ const _statusFilters = <String?, String>{
 };
 
 class OrdersScreen extends ConsumerStatefulWidget {
-  final String? orderId;
-
-  const OrdersScreen({super.key, this.orderId});
+  const OrdersScreen({super.key});
 
   @override
   ConsumerState<OrdersScreen> createState() => _OrdersScreenState();
@@ -37,6 +35,14 @@ class OrdersScreen extends ConsumerStatefulWidget {
 
 class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   String? _selectedStatus;
+  bool _searchExpanded = false;
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +74,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.search, color: Colors.white),
-                        onPressed: () {},
+                        onPressed: () => setState(() => _searchExpanded = !_searchExpanded),
                       ),
                       IconButton(
                         icon: const Icon(Icons.tune, color: Colors.white),
@@ -79,6 +85,48 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                 ),
               ),
             ),
+            // Barre de recherche dépliable, déclenchée par l'icône loupe
+            // ci-dessus. Filtre localement sur le numéro de commande.
+            if (_searchExpanded)
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                color: AppColors.surface,
+                child: Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          autofocus: true,
+                          onChanged: (_) => setState(() {}),
+                          style: AppTextStyles.bodyMedium,
+                          decoration: const InputDecoration(
+                            hintText: 'Rechercher un numéro de commande…',
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 18, color: AppColors.textSecondary),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchExpanded = false);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             // Bandeau des filtres de statut, resté blanc pour la lisibilité
             // des chips (comme la barre de recherche sous le dégradé).
             Container(
@@ -117,9 +165,16 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                     onRetry: () => ref.invalidate(ordersListProvider),
                   ),
                   data: (allOrders) {
-                    final orders = _selectedStatus == null
+                    var orders = _selectedStatus == null
                         ? allOrders
                         : allOrders.where((o) => o.status == _selectedStatus).toList();
+
+                    final query = _searchController.text.trim().toLowerCase();
+                    if (query.isNotEmpty) {
+                      orders = orders
+                          .where((o) => o.orderNumber.toLowerCase().contains(query))
+                          .toList();
+                    }
 
                     if (orders.isEmpty) {
                       // Enveloppé dans un ListView (et non un simple widget centré)
@@ -128,12 +183,14 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                       // aucune commande.
                       return ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        children: const [
-                          SizedBox(height: 80),
+                        children: [
+                          const SizedBox(height: 80),
                           EmptyState(
                             icon: Icons.receipt_long_outlined,
-                            title: 'Aucune commande',
-                            subtitle: 'Vos commandes passées apparaîtront ici.',
+                            title: query.isNotEmpty ? 'Aucun résultat' : 'Aucune commande',
+                            subtitle: query.isNotEmpty
+                                ? 'Aucune commande ne correspond à "$query".'
+                                : 'Vos commandes passées apparaîtront ici.',
                           ),
                         ],
                       );

@@ -9,6 +9,7 @@ import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/widgets/loading_indicator.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../core/widgets/simple_filter_chip.dart';
 import '../../../../../core/utils/validators.dart';
 import '../../../categories/presentation/providers/admin_categories_provider.dart';
 import '../../data/models/admin_product_model.dart';
@@ -388,14 +389,14 @@ class _AdminProductCreateScreenState extends ConsumerState<AdminProductCreateScr
               runSpacing: 8,
               children: attribute.options.map((option) {
                 final isSelected = selected.contains(option);
-                return FilterChip(
-                  label: Text(option),
+                return SimpleFilterChip(
+                  label: option,
                   selected: isSelected,
-                  onSelected: (v) => setState(() {
-                    if (v) {
-                      selected.add(option);
-                    } else {
+                  onTap: () => setState(() {
+                    if (isSelected) {
                       selected.remove(option);
+                    } else {
+                      selected.add(option);
                     }
                     _attributeValues[attribute.key] = List<String>.from(selected);
                   }),

@@ -1,3 +1,28 @@
+/// Helpers de parsing tolérants : un champ manquant/null/d'un type
+/// légèrement différent ne doit jamais faire planter tout l'écran de détail
+/// de commande — voir AdminOrderModel pour le même traitement côté admin.
+String _str(Map<String, dynamic> json, String key, [String fallback = '']) {
+  final v = json[key];
+  return v?.toString() ?? fallback;
+}
+
+String? _strOrNull(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  return v?.toString();
+}
+
+double _num(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  if (v == null) return 0;
+  return double.tryParse(v.toString()) ?? 0;
+}
+
+int _int(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  if (v == null) return 0;
+  return int.tryParse(v.toString()) ?? 0;
+}
+
 class OrderItemModel {
   final String id;
   final String productName;
@@ -17,12 +42,12 @@ class OrderItemModel {
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
     return OrderItemModel(
-      id: json['id'] as String,
-      productName: json['product_name'] as String,
-      sku: json['sku'] as String,
-      quantity: json['quantity'] as int,
-      unitPrice: double.parse(json['unit_price'].toString()),
-      totalAmount: double.parse(json['total_amount'].toString()),
+      id: _str(json, 'id'),
+      productName: _str(json, 'product_name', 'Article'),
+      sku: _str(json, 'sku'),
+      quantity: _int(json, 'quantity'),
+      unitPrice: _num(json, 'unit_price'),
+      totalAmount: _num(json, 'total_amount'),
     );
   }
 }
@@ -59,23 +84,37 @@ class OrderModel {
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
+    List<OrderItemModel> parseItems(dynamic raw) {
+      if (raw is! List) return [];
+      final result = <OrderItemModel>[];
+      for (final i in raw) {
+        if (i is Map<String, dynamic>) {
+          try {
+            result.add(OrderItemModel.fromJson(i));
+          } catch (_) {
+            // article individuel malformé : on l'ignore plutôt que de
+            // faire planter toute la commande (et donc toute la liste).
+          }
+        }
+      }
+      return result;
+    }
+
     return OrderModel(
-      id: json['id'] as String,
-      orderNumber: json['order_number'] as String,
-      status: json['status'] as String,
-      subtotal: double.parse(json['subtotal'].toString()),
-      discountAmount: double.parse(json['discount_amount'].toString()),
-      deliveryFee: double.parse(json['delivery_fee'].toString()),
-      totalAmount: double.parse(json['total_amount'].toString()),
-      notes: json['notes'] as String?,
-      placedAt: DateTime.parse(json['placed_at'] as String),
-      items: json['items'] != null
-          ? (json['items'] as List).map((i) => OrderItemModel.fromJson(i as Map<String, dynamic>)).toList()
-          : [],
-      address: json['address'] as Map<String, dynamic>?,
-      payment: json['payment'] as Map<String, dynamic>?,
-      statusHistory: json['status_history'] != null
-          ? List<Map<String, dynamic>>.from(json['status_history'] as List)
+      id: _str(json, 'id'),
+      orderNumber: _str(json, 'order_number'),
+      status: _str(json, 'status', 'PENDING'),
+      subtotal: _num(json, 'subtotal'),
+      discountAmount: _num(json, 'discount_amount'),
+      deliveryFee: _num(json, 'delivery_fee'),
+      totalAmount: _num(json, 'total_amount'),
+      notes: _strOrNull(json, 'notes'),
+      placedAt: DateTime.tryParse(_str(json, 'placed_at')) ?? DateTime.now(),
+      items: parseItems(json['items']),
+      address: json['address'] is Map<String, dynamic> ? json['address'] as Map<String, dynamic> : null,
+      payment: json['payment'] is Map<String, dynamic> ? json['payment'] as Map<String, dynamic> : null,
+      statusHistory: json['status_history'] is List
+          ? (json['status_history'] as List).whereType<Map<String, dynamic>>().toList()
           : null,
     );
   }

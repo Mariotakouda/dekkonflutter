@@ -8,6 +8,7 @@ import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/widgets/loading_indicator.dart';
 import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
+import '../../../../../core/widgets/simple_filter_chip.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/admin_delivery_model.dart';
@@ -70,11 +71,10 @@ class _AdminDeliveriesScreenState extends ConsumerState<AdminDeliveriesScreen> {
               itemBuilder: (context, index) {
                 final status = _statuses[index];
                 final selected = state.statusFilter == status;
-                return ChoiceChip(
-                  label: Text(status == null ? 'Toutes' : (_statusLabels[status] ?? status)),
+                return SimpleFilterChip(
+                  label: status == null ? 'Toutes' : (_statusLabels[status] ?? status),
                   selected: selected,
-                  onSelected: (_) => ref.read(adminDeliveryListProvider.notifier).filterByStatus(status),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.12),
+                  onTap: () => ref.read(adminDeliveryListProvider.notifier).filterByStatus(status),
                 );
               },
             ),

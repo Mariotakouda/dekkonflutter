@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
+import '../../../orders/presentation/providers/orders_provider.dart';
 import '../../data/models/checkout_model.dart';
 import '../../data/repositories/checkout_repository.dart';
 
@@ -66,6 +67,13 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
 
       // Rafraîchit le panier (désormais vide/converti côté backend).
       ref.invalidate(cartNotifierProvider);
+
+      // Rafraîchit "Mes commandes" pour que la commande qu'on vient de
+      // passer apparaisse immédiatement. Sans ça, comme l'onglet Commandes
+      // reste monté en permanence dans le StatefulShellRoute, le
+      // FutureProvider.autoDispose garde son ancien résultat en cache et la
+      // nouvelle commande n'apparaît qu'après un redémarrage complet de l'app.
+      ref.invalidate(ordersListProvider);
 
       return true;
     } catch (e) {

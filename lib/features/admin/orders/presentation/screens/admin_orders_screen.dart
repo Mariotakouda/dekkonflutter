@@ -11,6 +11,7 @@ import '../../../../../core/utils/formatters.dart';
 import '../../../../../core/widgets/loading_indicator.dart';
 import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
+import '../../../../../core/widgets/simple_filter_chip.dart';
 import '../../../../orders/presentation/widgets/order_status_badge.dart';
 import '../providers/admin_orders_provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -122,16 +123,10 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
               itemBuilder: (context, index) {
                 final status = _statuses[index];
                 final selected = state.statusFilter == status;
-                return ChoiceChip(
-                  label: Text(status == null ? 'Toutes' : (_statusLabels[status] ?? status)),
+                return SimpleFilterChip(
+                  label: status == null ? 'Toutes' : (_statusLabels[status] ?? status),
                   selected: selected,
-                  onSelected: (_) => ref.read(adminOrderListProvider.notifier).filterByStatus(status),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.12),
-                  labelStyle: TextStyle(
-                    color: selected ? AppColors.primary : AppColors.textSecondary,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                  side: BorderSide(color: selected ? AppColors.primary : AppColors.border),
+                  onTap: () => ref.read(adminOrderListProvider.notifier).filterByStatus(status),
                 );
               },
             ),

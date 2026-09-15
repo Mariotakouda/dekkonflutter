@@ -1,3 +1,35 @@
+/// Petits helpers de parsing tolérants : une valeur manquante, nulle ou d'un
+/// type légèrement différent (ex. int envoyé là où on attend un double) ne
+/// doit jamais faire planter tout l'écran de détail — au pire on affiche un
+/// champ vide/à 0, jamais une page d'erreur générique.
+String _str(Map<String, dynamic> json, String key, [String fallback = '']) {
+  final v = json[key];
+  return v?.toString() ?? fallback;
+}
+
+String? _strOrNull(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  return v?.toString();
+}
+
+double _num(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  if (v == null) return 0;
+  return double.tryParse(v.toString()) ?? 0;
+}
+
+int _int(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  if (v == null) return 0;
+  return int.tryParse(v.toString()) ?? 0;
+}
+
+DateTime? _dateOrNull(Map<String, dynamic> json, String key) {
+  final v = json[key];
+  if (v == null) return null;
+  return DateTime.tryParse(v.toString());
+}
+
 class AdminOrderItemModel {
   final String id;
   final String productName;
@@ -17,12 +49,12 @@ class AdminOrderItemModel {
 
   factory AdminOrderItemModel.fromJson(Map<String, dynamic> json) {
     return AdminOrderItemModel(
-      id: json['id'] as String,
-      productName: json['product_name'] as String,
-      sku: json['sku'] as String,
-      quantity: json['quantity'] as int,
-      unitPrice: double.parse(json['unit_price'].toString()),
-      totalAmount: double.parse(json['total_amount'].toString()),
+      id: _str(json, 'id'),
+      productName: _str(json, 'product_name', 'Article'),
+      sku: _str(json, 'sku'),
+      quantity: _int(json, 'quantity'),
+      unitPrice: _num(json, 'unit_price'),
+      totalAmount: _num(json, 'total_amount'),
     );
   }
 }
@@ -36,9 +68,9 @@ class AdminOrderCustomerModel {
 
   factory AdminOrderCustomerModel.fromJson(Map<String, dynamic> json) {
     return AdminOrderCustomerModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      phone: json['phone'] as String?,
+      id: _str(json, 'id'),
+      name: _str(json, 'name', 'Client'),
+      phone: _strOrNull(json, 'phone'),
     );
   }
 }
@@ -85,31 +117,53 @@ class AdminOrderModel {
   });
 
   factory AdminOrderModel.fromJson(Map<String, dynamic> json) {
+    // Certains items/entrées d'historique peuvent, selon la ressource
+    // Laravel utilisée, arriver dans une forme inattendue (ex. un objet
+    // au lieu d'une liste, ou un champ manquant sur une commande ancienne).
+    // On les ignore individuellement plutôt que de faire planter tout
+    // l'écran de détail — mieux vaut une commande incomplète qu'une page
+    // d'erreur générique "impossible de charger cette commande".
+    List<AdminOrderItemModel> parseItems(dynamic raw) {
+      if (raw is! List) return [];
+      final result = <AdminOrderItemModel>[];
+      for (final i in raw) {
+        if (i is Map<String, dynamic>) {
+          try {
+            result.add(AdminOrderItemModel.fromJson(i));
+          } catch (_) {
+            // item individuel malformé : on l'ignore plutôt que de tout casser
+          }
+        }
+      }
+      return result;
+    }
+
+    List<Map<String, dynamic>>? parseMapList(dynamic raw) {
+      if (raw is! List) return null;
+      return raw.whereType<Map<String, dynamic>>().toList();
+    }
+
     return AdminOrderModel(
-      id: json['id'] as String,
-      orderNumber: json['order_number'] as String,
-      status: json['status'] as String,
-      customer: json['customer'] != null
+      id: _str(json, 'id'),
+      orderNumber: _str(json, 'order_number'),
+      status: _str(json, 'status', 'PENDING'),
+      customer: json['customer'] is Map<String, dynamic>
           ? AdminOrderCustomerModel.fromJson(json['customer'] as Map<String, dynamic>)
           : null,
-      subtotal: double.parse(json['subtotal'].toString()),
-      discountAmount: double.parse(json['discount_amount'].toString()),
-      deliveryFee: double.parse(json['delivery_fee'].toString()),
-      totalAmount: double.parse(json['total_amount'].toString()),
-      notes: json['notes'] as String?,
-      placedAt: DateTime.parse(json['placed_at'] as String),
-      confirmedAt: json['confirmed_at'] != null ? DateTime.parse(json['confirmed_at'] as String) : null,
-      deliveredAt: json['delivered_at'] != null ? DateTime.parse(json['delivered_at'] as String) : null,
-      cancelledAt: json['cancelled_at'] != null ? DateTime.parse(json['cancelled_at'] as String) : null,
-      items: json['items'] != null
-          ? (json['items'] as List).map((i) => AdminOrderItemModel.fromJson(i as Map<String, dynamic>)).toList()
-          : [],
-      address: json['address'] as Map<String, dynamic>?,
-      payments: json['payments'] != null ? List<Map<String, dynamic>>.from(json['payments'] as List) : null,
-      delivery: json['delivery'] as Map<String, dynamic>?,
-      statusHistory: json['status_history'] != null
-          ? List<Map<String, dynamic>>.from(json['status_history'] as List)
-          : null,
+      subtotal: _num(json, 'subtotal'),
+      discountAmount: _num(json, 'discount_amount'),
+      deliveryFee: _num(json, 'delivery_fee'),
+      totalAmount: _num(json, 'total_amount'),
+      notes: _strOrNull(json, 'notes'),
+      placedAt: _dateOrNull(json, 'placed_at') ?? DateTime.now(),
+      confirmedAt: _dateOrNull(json, 'confirmed_at'),
+      deliveredAt: _dateOrNull(json, 'delivered_at'),
+      cancelledAt: _dateOrNull(json, 'cancelled_at'),
+      items: parseItems(json['items']),
+      address: json['address'] is Map<String, dynamic> ? json['address'] as Map<String, dynamic> : null,
+      payments: parseMapList(json['payments']),
+      delivery: json['delivery'] is Map<String, dynamic> ? json['delivery'] as Map<String, dynamic> : null,
+      statusHistory: parseMapList(json['status_history']),
     );
   }
 }

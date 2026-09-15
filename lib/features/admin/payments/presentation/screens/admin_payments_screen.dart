@@ -9,6 +9,7 @@ import '../../../../../core/utils/formatters.dart';
 import '../../../../../core/widgets/loading_indicator.dart';
 import '../../../../../core/widgets/error_view.dart';
 import '../../../../../core/widgets/empty_state.dart';
+import '../../../../../core/widgets/simple_filter_chip.dart';
 import '../../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/admin_payment_model.dart';
 import '../providers/admin_payments_provider.dart';
@@ -70,11 +71,10 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
               itemBuilder: (context, index) {
                 final status = _statuses[index];
                 final selected = state.statusFilter == status;
-                return ChoiceChip(
-                  label: Text(status == null ? 'Tous' : (_statusLabels[status] ?? status)),
+                return SimpleFilterChip(
+                  label: status == null ? 'Tous' : (_statusLabels[status] ?? status),
                   selected: selected,
-                  onSelected: (_) => ref.read(adminPaymentListProvider.notifier).filterByStatus(status),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.12),
+                  onTap: () => ref.read(adminPaymentListProvider.notifier).filterByStatus(status),
                 );
               },
             ),

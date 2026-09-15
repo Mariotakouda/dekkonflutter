@@ -7,8 +7,33 @@ import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/simple_filter_chip.dart';
 import '../../../categories/presentation/providers/categories_provider.dart';
+import '../../../categories/data/models/categories_model.dart';
 import '../providers/products_provider.dart';
 import '../widgets/product_grid.dart';
+
+/// Aplatit l'arbre catégories/sous-catégories en une liste plate pour la
+/// barre de filtres rapides. Sans ça, seules les catégories racines
+/// (ex: "Électronique") étaient proposées comme puces, alors que les
+/// produits sont rattachés aux sous-catégories (ex: "Téléphones") — filtrer
+/// sur la catégorie racine ne matchait donc aucun produit et affichait
+/// "Aucun produit trouvé" bien que le catalogue soit non vide.
+/// `depth` sert à préfixer visuellement les sous-catégories dans la puce.
+class _FlatCategory {
+  final CategoryModel category;
+  final int depth;
+  const _FlatCategory(this.category, this.depth);
+}
+
+List<_FlatCategory> _flattenCategories(List<CategoryModel> categories, [int depth = 0]) {
+  final result = <_FlatCategory>[];
+  for (final c in categories) {
+    result.add(_FlatCategory(c, depth));
+    if (c.children.isNotEmpty) {
+      result.addAll(_flattenCategories(c.children, depth + 1));
+    }
+  }
+  return result;
+}
 
 class ProductsScreen extends ConsumerStatefulWidget {
   final String? productId;
@@ -177,51 +202,65 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
           categoriesAsync.when(
             loading: () => const SizedBox.shrink(),
             error: (e, _) => const SizedBox.shrink(),
-            data: (categories) => SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  SimpleFilterChip(
-                    label: 'Tous',
-                    selected: _selectedCategoryId == null,
-                    onTap: () {
-                      setState(() => _selectedCategoryId = null);
-                      _applyFilters();
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ...categories.map((c) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: SimpleFilterChip(
-                          label: c.name,
-                          selected: _selectedCategoryId == c.id,
-                          onTap: () {
-                            setState(() => _selectedCategoryId = c.id);
-                            _applyFilters();
-                          },
-                        ),
-                      )),
-                ],
-              ),
-            ),
+            data: (categories) {
+              // Catégories ET sous-catégories aplaties : "Téléphones" doit
+              // pouvoir être sélectionné directement, pas seulement
+              // "Électronique" (voir commentaire sur _flattenCategories).
+              final flat = _flattenCategories(categories);
+              return SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    SimpleFilterChip(
+                      label: 'Tous',
+                      selected: _selectedCategoryId == null,
+                      onTap: () {
+                        setState(() => _selectedCategoryId = null);
+                        _applyFilters();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ...flat.map((fc) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: SimpleFilterChip(
+                            // Préfixe "› " pour montrer visuellement qu'il
+                            // s'agit d'une sous-catégorie (ex: "› Téléphones").
+                            label: fc.depth == 0 ? fc.category.name : '›  ${fc.category.name}',
+                            selected: _selectedCategoryId == fc.category.id,
+                            onTap: () {
+                              setState(() => _selectedCategoryId = fc.category.id);
+                              _applyFilters();
+                            },
+                          ),
+                        )),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 8),
 
           Expanded(
             child: state.isLoading
                 ? const LoadingIndicator()
-                : state.products.isEmpty
-                    ? const EmptyState(
-                        icon: Icons.search_off_rounded,
-                        title: 'Aucun produit trouvé',
-                        subtitle: 'Essayez une autre recherche ou catégorie.',
+                : state.error != null
+                    ? EmptyState(
+                        icon: Icons.error_outline,
+                        title: 'Erreur de chargement',
+                        subtitle: state.error!,
                       )
-                    : ProductGrid(
-                        products: state.products,
-                        scrollController: _scrollController,
-                      ),
+                    : state.products.isEmpty
+                        ? const EmptyState(
+                            icon: Icons.search_off_rounded,
+                            title: 'Aucun produit trouvé',
+                            subtitle: 'Essayez une autre recherche ou catégorie.',
+                          )
+                        : ProductGrid(
+                            products: state.products,
+                            scrollController: _scrollController,
+                          ),
           ),
 
           if (state.isLoadingMore)
